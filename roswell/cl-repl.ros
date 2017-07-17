@@ -271,7 +271,7 @@ exec ros -Q -- $0 "$@"
         (alexandria:switch
          (cmd :test #'equal)
          ("--version" (format t "CL-REPL ~a~%" +version+))
-         (t (format t "usage: cl-repl [--version]"))))
+         (t (format t "usage: cl-repl [--version]~%"))))
       (progn
         (format t "~a~%" *splash*)
         (finish-output)
