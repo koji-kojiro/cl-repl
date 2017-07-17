@@ -42,6 +42,8 @@ exec ros -Q -- $0 "$@"
   (format nil "~%(C) 2017 TANI Kojiro <kojiro0531@gmail.com>~%")))
 
 (defvar *last-input* nil)
+(defvar *history* nil)
+
 (define-condition exit-error (error) nil)
 
 (defun exit-with-prompt ()
@@ -84,6 +86,7 @@ exec ros -Q -- $0 "$@"
   (read-from-string *last-input*))
 
 (defun write-output (output)
+  (push *last-input* *history*)
   (if (> (length (princ-to-string output)) 0)
       (format t "~a ~a~%" (bold (cl-ansi-text:red "[OUT]:"))  output))
   (finish-output))
@@ -178,6 +181,12 @@ exec ros -Q -- $0 "$@"
 
 #+sbcl (rl:register-function :complete #'completer)
 
+(defun shell-commandp (input)
+  (alexandria:starts-with-subseq "!" input))
+
+(defun magic-commandp (input)
+  (alexandria:starts-with-subseq "%" input))
+
 (defun load-magic (args)
   (mapcar (lambda (x) (ql:quickload x :silent t)) args))
 
@@ -207,13 +216,24 @@ exec ros -Q -- $0 "$@"
                   (alexandria:mean results)
                   (apply #'min results))))))
 
+(defun save-magic (args)
+  (let ((fname (first args)))
+    (if (not fname)
+      (error "Empty file name."))
+    (with-open-file (out fname :direction :output)
+      (dolist (line (reverse *history*))
+        (if (not (or (shell-commandp line)
+                     (magic-commandp line)))
+          (format out "~a~%" line))))))
+
 (defun magic ()
   (let ((inputs (split-sequence:split-sequence #\space (subseq *last-input* 1))))
     (let ((cmd (car inputs)) (args (cdr inputs)))
       (alexandria:switch
        (cmd :test #'equal)
        ("load" (load-magic args))
-       ("time" (time-magic args)))))
+       ("time" (time-magic args))
+       ("save" (save-magic args)))))
   "")
 
 (defun shell ()
@@ -221,17 +241,11 @@ exec ros -Q -- $0 "$@"
    (trivial-shell:shell-command (subseq *last-input* 1)))
   "")
 
-(defun shell-commandp-last-input ()
-  (alexandria:starts-with-subseq "!" *last-input*))
-
-(defun magic-commandp-last-input ()
-  (alexandria:starts-with-subseq "%" *last-input*))
-
 (let (* ** *** - + ++ +++ / // /// values)
   (defun eval-input (-)
     (cond
-      ((magic-commandp-last-input) (magic))
-      ((shell-commandp-last-input) (shell))
+      ((magic-commandp *last-input*) (magic))
+      ((shell-commandp *last-input*) (shell))
       (t (progn
            (setq
             values
