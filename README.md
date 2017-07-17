@@ -15,7 +15,7 @@ CL-REPL is a full-featured repl implementation designed to work with **[Roswell]
 - Portable.<br>
   Written as a **[Roswell script](https://github.com/roswell/roswell/wiki/2.-Roswell-as-a-Scripting-Environment)**.
 - Emacs-like key bindings.<br>
-  Provides powerful line edditor on REPL.
+  Provides powerful line editor on REPL.
 - Tab-completion. (Currently, supported only on SBCL)
 - Shell commands and magic commands.
 
@@ -57,7 +57,7 @@ Save input history into [file].
 
 ### %time [expression]
 
-Measure execusion time of the expression.
+Measure execusion time of [expression].
 
 # License
 
