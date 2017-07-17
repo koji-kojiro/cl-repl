@@ -2,8 +2,9 @@
 
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)<br>
 
-<center><img src="./image/cl-repl.gif" alt="cl-repl">
-  <br></center>
+<p align="center">
+  <img src="image/cl-repl.gif">
+</p>
 
 # Overview
 
