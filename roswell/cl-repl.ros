@@ -11,6 +11,7 @@ exec ros -Q -- $0 "$@"
                               :trivial-shell
                               :trivial-timeout
                               :split-sequence
+                              #-sbcl :cffi
                               :cl-fad)
                             :silent t))
 
@@ -180,6 +181,23 @@ exec ros -Q -- $0 "$@"
         els)))
 
 #+sbcl (rl:register-function :complete #'completer)
+#-sbcl (progn
+         (cffi:define-foreign-library readline
+             (:darwin (:or "libreadline.dylib"))
+           (:unix (:or "libreadline.so.6.3"
+                       "libreadline.so.6"
+                       "libreadline.so"))
+           (t (:default "libreadline")))
+         (cffi:use-foreign-library readline)
+         (setf rl::*attempted-completion-function*
+               (rl::produce-callback
+                (lambda (text start end)
+                  (prog1
+                      (rl::to-array-of-strings
+                       (funcall #'completer text start end))
+                    (setf rl::*attempted-completion-over* t)))
+                :pointer
+                (:string :int :int))))
 
 (defun shell-commandp (input)
   (alexandria:starts-with-subseq "!" input))
@@ -219,12 +237,12 @@ exec ros -Q -- $0 "$@"
 (defun save-magic (args)
   (let ((fname (first args)))
     (if (not fname)
-      (error "Empty file name."))
+        (error "Empty file name."))
     (with-open-file (out fname :direction :output)
       (dolist (line (reverse *history*))
         (if (not (or (shell-commandp line)
                      (magic-commandp line)))
-          (format out "~a~%" line))))))
+            (format out "~a~%" line))))))
 
 (defun magic ()
   (let ((inputs (split-sequence:split-sequence #\space (subseq *last-input* 1))))
