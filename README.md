@@ -16,14 +16,22 @@ CL-REPL is a full-featured repl implementation designed to work with **[Roswell]
   Written as a **[Roswell script](https://github.com/roswell/roswell/wiki/2.-Roswell-as-a-Scripting-Environment)**.
 - Emacs-like key bindings.<br>
   Provides powerful line editor on REPL.
-- Tab-completion. (Currently, supported only on SBCL)
+- Tab-completion.
 - Shell commands and magic commands.
 
 Of course, the other general features are available! (e.g. debugger)
 
+## Surpported Lisps
+
+- Steel Bank Common Lisp (Recommended)
+- Clozure CL
+- Allegro CL
+
+We mainly target SBCL and CCL. It might work even on the other implementations, but not guarantied.
+
 # Installation
 
-via Roswell.<br>
+Via Roswell.<br>
 `$ ros install koji-kojiro/cl-repl`
 
 # Usage
