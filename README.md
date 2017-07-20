@@ -36,7 +36,7 @@ Via Roswell.<br>
 
 # Usage
 
-## Shell commands
+## Shell commands (![commands]...)
 
 If the line starts with "!", excute it as shell commnads.
 
@@ -66,6 +66,10 @@ Save input history into [file].
 ### %time [expression]
 
 Measure execusion time of [expression].
+
+## Introspection (?[symbol's name])
+
+IPython style introspection is available.
 
 # License
 
