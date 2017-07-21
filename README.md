@@ -35,15 +35,11 @@ Via Roswell.<br>
 `$ ros install koji-kojiro/cl-repl`
 
 # Usage
-```
-$ cl-repl
-```
+`$ cl-repl`
 
 or,
 
-```
-$ ros repl
-```
+`$ ros repl`
 
 
 ## Shell commands (![commands]...)
