@@ -11,10 +11,7 @@ exec ros -Q -- $0 "$@"
 (ros:include "util")
 
 (defconstant +usage+
-  "A full-featured Common Lisp REPL implementation.
-
-Usage:
-  cl-repl [OPTIONS]
+  "Usage: ros [OPTIONS] repl [OPTIONS]
 
 Options:
   --help      Show this screen and exit.
@@ -22,7 +19,7 @@ Options:
 
 ")
 
-(defconstant +short-usage+ "try `cl-repl --help`")
+(defconstant +short-usage+ "try `ros repl --help`")
 
 (defconstant +versions-string+
   (concatenate 'string
@@ -42,8 +39,8 @@ Options:
                          ("--version" (format t "~a~%" +version+))
                          (t (format t "~a~%" +short-usage+)))
       (progn
-        (format t "~a~%" (concatenate 'string *splash* +versions-string+))
-        (finish-output)
-        (repl))))
+	(format t "~a~%" +versions-string+)
+	(finish-output)
+	(repl))))
 
 ;;; vim: set ft=lisp lisp:
