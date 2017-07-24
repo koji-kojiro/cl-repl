@@ -1,6 +1,6 @@
 # CL-REPL - Common Lisp REPL for Roswell
 
-[![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)<br>
+<!-- [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)<br> -->
 
 <p align="center">
   <img src="image/cl-repl.gif">
@@ -75,6 +75,15 @@ Some useful magic commands are available. All magic commands have name prefixed 
 ### %edit (for SBCL only)
 Start editing the code with the text editor specified by the environment variable `EDITOR`.
 Currently, supported only for SBCL.
+
+We tested below editors.
+- emacs (recommended)
+- lem (recommended)
+- vi
+- joe
+- nano
+
+We recommend to add the line `export EDITOR="emacs -nw -q"` to your `.bashrc`. We recommend [lem](https://github.com/cxxxr/lem) also, because it's very lightweight and highly optimized for Common Lisp.
 
 ### %load [systems]...
 
