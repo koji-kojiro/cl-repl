@@ -219,7 +219,7 @@
       (setf *last-input* edited)
       (format t "Executing edited code...~%~a~%" (bold (cl-ansi-text:blue edited)))
       (delete-file tmp)))
-  (eval (read-from-string (concatenate 'string "(progn" *last-input* ")"))))
+  (eval (read-from-string (concatenate 'string "(progn " *last-input* ")"))))
 
 (defun load-magic (args)
   (mapcar (lambda (x) (ql:quickload x :silent t)) args)
