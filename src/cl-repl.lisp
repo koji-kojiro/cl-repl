@@ -59,7 +59,7 @@
            (progn
              (format t "~%")
              (return))
-           (setf *last-input* (concatenate 'string *last-input* " " input)))))
+           (setf *last-input* (concatenate 'string *last-input* (format nil "~%") input)))))
   (read-from-string *last-input*))
 
 (defun write-output (output)
@@ -74,23 +74,32 @@
 (defun debugger (condition)
   (print-condition condition)
   (format t
-          (cl-ansi-text:blue (bold "~a~%~a~%~%"))
+          (cl-ansi-text:blue (bold "~a~%~a~%~a~%~%"))
           "[0]: Try evaluating again."
-          "[1]: Return to top level.")
+          "[1]: Return to top level."
+	  "[2]: Edit code.")
   (finish-output)
   (let ((last-input *last-input*))
     (loop
        (handler-case
-           (let ((input (read-input :prompt "DEBUG> ")))
+       (let ((input (read-input :prompt "DEBUG> ")))
+	 (handler-case
              (alexandria:switch (input)
                                 (0 (progn
                                      (write-output
                                       (eval (read-from-string last-input))) (return)))
                                 (1 (return))
-                                (t (write-output (eval input)))))
-         (exit-error () (progn (finish-output) (return "")))
+				(2 (progn
+				     (write-output
+				      (edit-magic nil :code last-input))
+				     (return)))
+                                (t (write-output (eval input))))
          (error (condition)
-           (print-condition condition)))
+	   (progn
+	     (if (eq input 2)
+	       (setf last-input *last-input*))
+	     (print-condition condition)))))
+	 (exit-error () (progn (finish-output) (return ""))))
        (finish-output))))
 
 (defun common-prefix (items)
@@ -184,8 +193,34 @@
 (defun magic-commandp (input)
   (alexandria:starts-with-subseq "%" input))
 
+(defun create-tmpfile (&optional (code nil))
+  (cl-fad:with-output-to-temporary-file (tmp :template "/tmp/common-lisp-edit-%.lisp")
+    (format tmp ";; edit code, then save it and exit.~%")
+    (if code (princ code tmp))))
+
+(defun open-editor (filepath)
+  (let ((editor (uiop:getenv "EDITOR")))
+    (if (not editor)
+	(setf editor "vi"))
+    (format t "Openning editor...~%")
+    (finish-output)
+    (inferior-shell:run/interactive
+     (format nil "~a ~a" editor (namestring filepath))))
+  (with-open-file (s filepath :direction :input)
+    (let ((buf (make-string (file-length s))))
+      (read-sequence buf s) buf)))
+
+(defun edit-magic (args &key (code nil))
+  (let ((tmp (create-tmpfile code)))
+    (let ((edited (open-editor tmp)))
+      (setf *last-input* edited)
+      (format t "Done.~%Executing edited code...~%~a~%" (cl-ansi-text:blue edited))
+    (delete-file tmp)))
+  (eval-input (read-from-string (concatenate 'string "(progn" *last-input* ")"))))
+
 (defun load-magic (args)
-  (mapcar (lambda (x) (ql:quickload x :silent t)) args))
+  (mapcar (lambda (x) (ql:quickload x :silent t)) args)
+  "")
 
 (defun print-second (time)
   (format t "~a sec~%" (float (/ time internal-time-units-per-second))))
@@ -211,7 +246,8 @@
           (format t "~a loops, average: ~f ms, best: ~f ms~%"
                   ntimes
                   (alexandria:mean results)
-                  (apply #'min results))))))
+                  (apply #'min results)))))
+  "")
 
 (defun save-magic (args)
   (let ((fname (first args)))
@@ -221,7 +257,8 @@
       (dolist (line (reverse *history*))
         (if (not (or (shell-commandp line)
                      (magic-commandp line)))
-            (format out "~a~%" line))))))
+            (format out "~a~%" line)))))
+  "")
 
 (defun introspection ()
   (let ((object (subseq *last-input* 1)))
@@ -250,12 +287,11 @@
        (cmd :test #'equal)
        ("load" (load-magic args))
        ("time" (time-magic args))
-       ("save" (save-magic args)))))
-  "")
+       ("edit" (edit-magic nil))
+       ("save" (save-magic args))))))
 
 (defun shell ()
-  (princ
-   (trivial-shell:shell-command (subseq *last-input* 1)))
+  (inferior-shell:run (subseq *last-input* 1))
   "")
 
 (let (* ** *** - + ++ +++ / // /// values)
