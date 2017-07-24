@@ -74,10 +74,11 @@
 (defun debugger (condition)
   (print-condition condition)
   (format t
-          (cl-ansi-text:blue (bold "~a~%~a~%~a~%~%"))
+          (cl-ansi-text:blue (bold "~a~%~a~%~a~%"))
           "[0]: Try evaluating again."
           "[1]: Return to top level."
-	  "[2]: Edit code.")
+	  #+sbcl (format nil "~a~%" "[2]: Edit code.")
+	  #-sbcl "")
   (finish-output)
   (let ((last-input *last-input*))
     (loop
@@ -89,7 +90,7 @@
                                      (write-output
                                       (eval (read-from-string last-input))) (return)))
                                 (1 (return))
-				(2 (progn
+				#+sbcl(2 (progn
 				     (write-output
 				      (edit-magic nil :code last-input))
 				     (return)))
@@ -193,10 +194,12 @@
 (defun magic-commandp (input)
   (alexandria:starts-with-subseq "%" input))
 
+#+sbcl
 (defun create-tmpfile (&optional (code nil))
   (cl-fad:with-output-to-temporary-file (tmp :template "/tmp/common-lisp-edit-%.lisp")
     (if code (princ code tmp))))
 
+#+sbcl
 (defun open-editor (filepath)
   (let ((editor (uiop:getenv "EDITOR")))
     (if (not editor)
@@ -209,6 +212,7 @@
     (let ((buf (make-string (file-length s))))
       (read-sequence buf s) buf)))
 
+#+sbcl
 (defun edit-magic (args &key (code nil))
   (let ((tmp (create-tmpfile code)))
     (let ((edited (open-editor tmp)))
@@ -286,8 +290,9 @@
        (cmd :test #'equal)
        ("load" (load-magic args))
        ("time" (time-magic args))
-       ("edit" (edit-magic nil))
-       ("save" (save-magic args))))))
+       #+sbcl("edit" (edit-magic nil))
+       ("save" (save-magic args))
+       (t "")))))
 
 (defun shell ()
   (inferior-shell:run (subseq *last-input* 1))
