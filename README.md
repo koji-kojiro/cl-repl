@@ -41,6 +41,17 @@ or,
 
 `$ ros repl`
 
+## debugger
+When a condition is caught by REPL, the debugger starts up. You can select a restart type from three kinds of candidates. Please enter the number corresponding to the desired restart type and hit enter key. You can also execute any codes before restarting.
+
+### Restart type
+- [0]. Try evaluating again.
+    The debugger will try to evaluating the code again.
+- [1]. Return to top level.
+    The debugger will be aborted without re-evaluating the code.
+- [2]. Edit code. (Only for SBCL)
+    The text editor specified by the environment variable `EDITOR` will start.
+    You can rewrite code with the editor.
 
 ## Shell commands (![commands]...)
 
@@ -60,6 +71,10 @@ CL-USER>
 ## Magic commands
 
 Some useful magic commands are available. All magic commands have name prefixed "%".
+
+### %edit (for SBCL only)
+Start editing the code with the text editor specified by the environment variable `EDITOR`.
+Currently, supported only for SBCL.
 
 ### %load [systems]...
 
