@@ -195,14 +195,13 @@
 
 (defun create-tmpfile (&optional (code nil))
   (cl-fad:with-output-to-temporary-file (tmp :template "/tmp/common-lisp-edit-%.lisp")
-    (format tmp ";; edit code, then save it and exit.~%")
     (if code (princ code tmp))))
 
 (defun open-editor (filepath)
   (let ((editor (uiop:getenv "EDITOR")))
     (if (not editor)
 	(setf editor "vi"))
-    (format t "Openning editor...~%")
+    (format t "Openning file: ~a~%" filepath)
     (finish-output)
     (inferior-shell:run/interactive
      (format nil "~a ~a" editor (namestring filepath))))
@@ -214,9 +213,9 @@
   (let ((tmp (create-tmpfile code)))
     (let ((edited (open-editor tmp)))
       (setf *last-input* edited)
-      (format t "Done.~%Executing edited code...~%~a~%" (cl-ansi-text:blue edited))
+      (format t "Executing edited code...~%~a~%" (bold (cl-ansi-text:blue edited)))
     (delete-file tmp)))
-  (eval-input (read-from-string (concatenate 'string "(progn" *last-input* ")"))))
+  (eval (read-from-string (concatenate 'string "(progn" *last-input* ")"))))
 
 (defun load-magic (args)
   (mapcar (lambda (x) (ql:quickload x :silent t)) args)
