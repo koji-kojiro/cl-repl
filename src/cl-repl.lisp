@@ -83,23 +83,23 @@
   (let ((last-input *last-input*))
     (loop
        (handler-case
-       (let ((input (read-input :prompt "DEBUG> ")))
-	 (handler-case
-             (alexandria:switch (input)
-                                (0 (progn
-                                     (write-output
-                                      (eval (read-from-string last-input))) (return)))
-                                (1 (return))
-				#+sbcl(2 (progn
-				     (write-output
-				      (edit-magic nil :code last-input))
-				     (return)))
-                                (t (write-output (eval input))))
-         (error (condition)
-	   (progn
-	     (if (eq input 2)
-	       (setf last-input *last-input*))
-	     (print-condition condition)))))
+           (let ((input (read-input :prompt "DEBUG> ")))
+             (handler-case
+                 (alexandria:switch (input)
+                                    (0 (progn
+                                         (write-output
+                                          (eval (read-from-string last-input))) (return)))
+                                    (1 (return))
+                                    #+sbcl(2 (progn
+                                               (write-output
+                                                (edit-magic nil :code last-input))
+                                               (return)))
+                                    (t (write-output (eval input))))
+               (error (condition)
+                 (progn
+                   (if (eq input 2)
+                       (setf last-input *last-input*))
+                   (print-condition condition)))))
 	 (exit-error () (progn (finish-output) (return ""))))
        (finish-output))))
 
@@ -218,7 +218,7 @@
     (let ((edited (open-editor tmp)))
       (setf *last-input* edited)
       (format t "Executing edited code...~%~a~%" (bold (cl-ansi-text:blue edited)))
-    (delete-file tmp)))
+      (delete-file tmp)))
   (eval (read-from-string (concatenate 'string "(progn" *last-input* ")"))))
 
 (defun load-magic (args)
@@ -255,7 +255,7 @@
 (defun save-magic (args)
   (let ((fname (first args)))
     (if (not fname)
-      (error "Empty file name."))
+        (error "Empty file name."))
     (with-open-file (out fname :direction :output)
       (dolist (line (reverse *history*))
         (if (not (or (shell-commandp line)
@@ -266,21 +266,21 @@
 (defun introspection ()
   (let ((object (subseq *last-input* 1)))
     (if (not object)
-      (return-from introspection ""))
+        (return-from introspection ""))
     (let ((spec (car (trivial-documentation:symbol-definitions (read-from-string object)))))
       (let ((aspec (alexandria:plist-alist spec)))
         (if (not (cdr (assoc :kind aspec)))
-          (return-from introspection ""))
+            (return-from introspection ""))
         (format t "~a~a~%" (bold (cl-ansi-text:red "Type: "))
-                           (string-downcase (princ-to-string (cdr (assoc :kind aspec)))))
+                (string-downcase (princ-to-string (cdr (assoc :kind aspec)))))
         (if (assoc :lambda-list aspec)
-          (format t "~a~a~%" (bold (cl-ansi-text:red "Args: "))
-                             (string-downcase (princ-to-string (cdr (assoc :lambda-list aspec))))))
+            (format t "~a~a~%" (bold (cl-ansi-text:red "Args: "))
+                    (string-downcase (princ-to-string (cdr (assoc :lambda-list aspec))))))
         (if (assoc :value aspec)
-          (format t "~a~a~%" (bold (cl-ansi-text:red "Value: ")) (cdr (assoc :value aspec))))
+            (format t "~a~a~%" (bold (cl-ansi-text:red "Value: ")) (cdr (assoc :value aspec))))
         (if (cdr (assoc :documentation aspec))
-          (let ((doc (cdr (assoc :documentation aspec))))
-            (format t "~a~w~%" (bold (cl-ansi-text:red "Docstring: ")) doc))))))
+            (let ((doc (cdr (assoc :documentation aspec))))
+              (format t "~a~w~%" (bold (cl-ansi-text:red "Docstring: ")) doc))))))
   "")
 
 (defun magic ()
