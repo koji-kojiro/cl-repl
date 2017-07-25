@@ -59,7 +59,7 @@
            (progn
              (format t "~%")
              (return))
-           (setf *last-input* (concatenate 'string *last-input* " " input)))))
+           (setf *last-input* (concatenate 'string *last-input* (format nil "~%") input)))))
   (read-from-string *last-input*))
 
 (defun write-output (output)
@@ -74,23 +74,33 @@
 (defun debugger (condition)
   (print-condition condition)
   (format t
-          (cl-ansi-text:blue (bold "~a~%~a~%~%"))
+          (cl-ansi-text:blue (bold "~a~%~a~%~a~%"))
           "[0]: Try evaluating again."
-          "[1]: Return to top level.")
+          "[1]: Return to top level."
+	  #+sbcl (format nil "~a~%" "[2]: Edit code.")
+	  #-sbcl "")
   (finish-output)
   (let ((last-input *last-input*))
     (loop
        (handler-case
            (let ((input (read-input :prompt "DEBUG> ")))
-             (alexandria:switch (input)
-                                (0 (progn
-                                     (write-output
-                                      (eval (read-from-string last-input))) (return)))
-                                (1 (return))
-                                (t (write-output (eval input)))))
-         (exit-error () (progn (finish-output) (return "")))
-         (error (condition)
-           (print-condition condition)))
+             (handler-case
+                 (alexandria:switch (input)
+                                    (0 (progn
+                                         (write-output
+                                          (eval (read-from-string last-input))) (return)))
+                                    (1 (return))
+                                    #+sbcl(2 (progn
+                                               (write-output
+                                                (edit-magic nil :code last-input))
+                                               (return)))
+                                    (t (write-output (eval input))))
+               (error (condition)
+                 (progn
+                   (if (eq input 2)
+                       (setf last-input *last-input*))
+                   (print-condition condition)))))
+	 (exit-error () (progn (finish-output) (return ""))))
        (finish-output))))
 
 (defun common-prefix (items)
@@ -184,8 +194,36 @@
 (defun magic-commandp (input)
   (alexandria:starts-with-subseq "%" input))
 
+#+sbcl
+(defun create-tmpfile (&optional (code nil))
+  (cl-fad:with-output-to-temporary-file (tmp :template "/tmp/common-lisp-edit-%.lisp")
+    (if code (princ code tmp))))
+
+#+sbcl
+(defun open-editor (filepath)
+  (let ((editor (uiop:getenv "EDITOR")))
+    (if (not editor)
+	(setf editor "vi"))
+    (format t "Openning file: ~a~%" filepath)
+    (finish-output)
+    (inferior-shell:run/interactive
+     (format nil "~a ~a" editor (namestring filepath))))
+  (with-open-file (s filepath :direction :input)
+    (let ((buf (make-string (file-length s))))
+      (read-sequence buf s) buf)))
+
+#+sbcl
+(defun edit-magic (args &key (code nil))
+  (let ((tmp (create-tmpfile code)))
+    (let ((edited (open-editor tmp)))
+      (setf *last-input* edited)
+      (format t "Executing edited code...~%~a~%" (bold (cl-ansi-text:blue edited)))
+      (delete-file tmp)))
+  (eval (read-from-string (concatenate 'string "(progn " *last-input* ")"))))
+
 (defun load-magic (args)
-  (mapcar (lambda (x) (ql:quickload x :silent t)) args))
+  (mapcar (lambda (x) (ql:quickload x :silent t)) args)
+  "")
 
 (defun print-second (time)
   (format t "~a sec~%" (float (/ time internal-time-units-per-second))))
@@ -211,36 +249,38 @@
           (format t "~a loops, average: ~f ms, best: ~f ms~%"
                   ntimes
                   (alexandria:mean results)
-                  (apply #'min results))))))
+                  (apply #'min results)))))
+  "")
 
 (defun save-magic (args)
   (let ((fname (first args)))
     (if (not fname)
-      (error "Empty file name."))
+        (error "Empty file name."))
     (with-open-file (out fname :direction :output)
       (dolist (line (reverse *history*))
         (if (not (or (shell-commandp line)
                      (magic-commandp line)))
-            (format out "~a~%" line))))))
+            (format out "~a~%" line)))))
+  "")
 
 (defun introspection ()
   (let ((object (subseq *last-input* 1)))
     (if (not object)
-      (return-from introspection ""))
+        (return-from introspection ""))
     (let ((spec (car (trivial-documentation:symbol-definitions (read-from-string object)))))
       (let ((aspec (alexandria:plist-alist spec)))
         (if (not (cdr (assoc :kind aspec)))
-          (return-from introspection ""))
+            (return-from introspection ""))
         (format t "~a~a~%" (bold (cl-ansi-text:red "Type: "))
-                           (string-downcase (princ-to-string (cdr (assoc :kind aspec)))))
+                (string-downcase (princ-to-string (cdr (assoc :kind aspec)))))
         (if (assoc :lambda-list aspec)
-          (format t "~a~a~%" (bold (cl-ansi-text:red "Args: "))
-                             (string-downcase (princ-to-string (cdr (assoc :lambda-list aspec))))))
+            (format t "~a~a~%" (bold (cl-ansi-text:red "Args: "))
+                    (string-downcase (princ-to-string (cdr (assoc :lambda-list aspec))))))
         (if (assoc :value aspec)
-          (format t "~a~a~%" (bold (cl-ansi-text:red "Value: ")) (cdr (assoc :value aspec))))
+            (format t "~a~a~%" (bold (cl-ansi-text:red "Value: ")) (cdr (assoc :value aspec))))
         (if (cdr (assoc :documentation aspec))
-          (let ((doc (cdr (assoc :documentation aspec))))
-            (format t "~a~w~%" (bold (cl-ansi-text:red "Docstring: ")) doc))))))
+            (let ((doc (cdr (assoc :documentation aspec))))
+              (format t "~a~w~%" (bold (cl-ansi-text:red "Docstring: ")) doc))))))
   "")
 
 (defun magic ()
@@ -250,12 +290,12 @@
        (cmd :test #'equal)
        ("load" (load-magic args))
        ("time" (time-magic args))
-       ("save" (save-magic args)))))
-  "")
+       #+sbcl("edit" (edit-magic nil))
+       ("save" (save-magic args))
+       (t "")))))
 
 (defun shell ()
-  (princ
-   (trivial-shell:shell-command (subseq *last-input* 1)))
+  (inferior-shell:run (subseq *last-input* 1))
   "")
 
 (let (* ** *** - + ++ +++ / // /// values)

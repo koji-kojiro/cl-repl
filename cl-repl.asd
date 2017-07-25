@@ -8,12 +8,13 @@
   :author "TANI Kojiro"
   :license "MIT"
   :depends-on (#:alexandria
+	       #:uiop
 	       #:cl-fad
 	       #:cl-ppcre
 	       #:cl-ansi-text
 	       #:cl-readline
 	       #:alexandria
-	       #:trivial-shell
+	       #:inferior-shell
 	       #:trivial-timeout
 	       #:trivial-documentation
 	       #:split-sequence
