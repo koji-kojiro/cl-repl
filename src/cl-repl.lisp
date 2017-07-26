@@ -92,7 +92,9 @@
                                     (1 (return))
                                     #+sbcl(2 (progn
                                                (write-output
-                                                (edit-magic nil :code last-input))
+						(if *file-to-open*
+						    (edit-magic (list *file-to-open*))
+						    (edit-magic nil :code last-input)))
                                                (return)))
                                     (t (write-output (eval input))))
                (error (condition)
@@ -195,6 +197,9 @@
   (alexandria:starts-with-subseq "%" input))
 
 #+sbcl
+(defparameter *file-to-open* nil)
+
+#+sbcl
 (defun create-tmpfile (&optional (code nil))
   (cl-fad:with-output-to-temporary-file (tmp :template "/tmp/common-lisp-edit-%.lisp")
     (if code (princ code tmp))))
@@ -214,16 +219,18 @@
 
 #+sbcl
 (defun edit-magic (args &key (code nil))
-  (let ((tmp (create-tmpfile code)))
+  (if (first args)
+      (setf *file-to-open* (first args))
+      (setf *file-to-open* nil))
+  (let ((tmp (if *file-to-open* *file-to-open* (create-tmpfile code))))
     (let ((edited (open-editor tmp)))
       (setf *last-input* edited)
       (format t "Executing edited code...~%~a~%" (bold (cl-ansi-text:blue edited)))
-      (delete-file tmp)))
+      (unless *file-to-open* (delete-file tmp))))
   (eval (read-from-string (concatenate 'string "(progn " *last-input* ")"))))
 
 (defun load-magic (args)
-  (mapcar (lambda (x) (ql:quickload x :silent t)) args)
-  "")
+  (mapcar (lambda (x) (ql:quickload x :silent t)) args) "")
 
 (defun print-second (time)
   (format t "~a sec~%" (float (/ time internal-time-units-per-second))))
@@ -249,8 +256,7 @@
           (format t "~a loops, average: ~f ms, best: ~f ms~%"
                   ntimes
                   (alexandria:mean results)
-                  (apply #'min results)))))
-  "")
+                  (apply #'min results))))) "")
 
 (defun save-magic (args)
   (let ((fname (first args)))
@@ -260,8 +266,7 @@
       (dolist (line (reverse *history*))
         (if (not (or (shell-commandp line)
                      (magic-commandp line)))
-            (format out "~a~%" line)))))
-  "")
+            (format out "~a~%" line))))) "")
 
 (defun introspection ()
   (let ((object (subseq *last-input* 1)))
@@ -280,8 +285,7 @@
             (format t "~a~a~%" (bold (cl-ansi-text:red "Value: ")) (cdr (assoc :value aspec))))
         (if (cdr (assoc :documentation aspec))
             (let ((doc (cdr (assoc :documentation aspec))))
-              (format t "~a~w~%" (bold (cl-ansi-text:red "Docstring: ")) doc))))))
-  "")
+              (format t "~a~w~%" (bold (cl-ansi-text:red "Docstring: ")) doc)))))) "")
 
 (defun magic ()
   (let ((inputs (split-sequence:split-sequence #\space (subseq *last-input* 1))))
@@ -290,13 +294,12 @@
        (cmd :test #'equal)
        ("load" (load-magic args))
        ("time" (time-magic args))
-       #+sbcl("edit" (edit-magic nil))
+       #+sbcl("edit" (edit-magic args))
        ("save" (save-magic args))
        (t "")))))
 
 (defun shell ()
-  (inferior-shell:run (subseq *last-input* 1))
-  "")
+  (inferior-shell:run (subseq *last-input* 1)) "")
 
 (let (* ** *** - + ++ +++ / // /// values)
   (defun eval-input (-)
@@ -313,11 +316,18 @@
                  ++ + // / ** (car //)
                  + - / values * (car /)) )))))
 
-(defun repl ()
+(defun repl (&key (load nil))
   (in-package :cl-user)
-  (loop
-     (handler-case
-         (write-output (eval-input (read-input)))
-       (exit-error () (return))
-       (condition (c)
-         (debugger c)))))
+  (macrolet ((print-with-handler (&rest body)
+	       `(handler-case
+		    (write-output ,@body)
+		  (exit-error () (return-from repl))
+		  (condition (c) (debugger c)))))
+    (if load (let ((*file-to-open* load))
+	       (print-with-handler
+		(with-open-file (s load :direction :input)
+		  (let ((buf (make-string (file-length s))))
+		    (read-sequence buf s)
+		    (setf *last-input* buf)
+		    (eval-input (read-from-string (concatenate 'string "(progn " buf ")"))))))))
+    (loop (print-with-handler (eval-input (read-input))))))
