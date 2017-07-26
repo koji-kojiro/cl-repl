@@ -17,8 +17,9 @@ Usage:
   cl-repl [OPTIONS]
 
 Options:
-  --help      Show this screen and exit.
-  --version   Show the version info and exit.
+  --help        Show this screen and exit.
+  --version     Show the version info and exit.
+  --load <file> Load <file> when startup.
 
 ")
 
@@ -40,6 +41,7 @@ Options:
       (alexandria:switch ((first argv) :test #'equal)
                          ("--help" (format t +usage+))
                          ("--version" (format t "~a~%" +version+))
+			 ("--load" (repl :load (first (last argv))))
                          (t (format t "~a~%" +short-usage+)))
       (progn
         (format t "~a~%" (concatenate 'string *splash* +versions-string+))
