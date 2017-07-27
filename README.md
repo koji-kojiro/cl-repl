@@ -41,6 +41,20 @@ or,
 
 `$ ros repl`
 
+```
+$ cl-repl --help
+A full-featured Common Lisp REPL implementation.
+
+Usage:
+  cl-repl [OPTIONS]
+
+Options:
+  --help        Show this screen and exit.
+  --version     Show the version info and exit.
+  --load <file> Load <file> when startup.
+
+```
+
 ## debugger
 When a condition is caught by REPL, the debugger starts up. You can select a restart type from three kinds of candidates. Please enter the number corresponding to the desired restart type and hit enter key. You can also execute any codes before restarting.
 
@@ -72,9 +86,8 @@ CL-USER>
 
 Some useful magic commands are available. All magic commands have name prefixed "%".
 
-### %edit (for SBCL only)
-Start editing the code with the text editor specified by the environment variable `EDITOR`.
-Currently, supported only for SBCL.
+### %edit [file] (for SBCL only)
+Start editing the code with the text editor specified by the environment variable `EDITOR`. When [file] is not given, a temporary file will be created. Currently, supported for SBCL only.
 
 We tested below editors.
 - emacs (recommended)
@@ -84,6 +97,7 @@ We tested below editors.
 - nano
 
 We recommend to add the line `export EDITOR="emacs -nw -q"` to your `.bashrc`. We recommend [lem](https://github.com/cxxxr/lem) also, because it's very lightweight and highly optimized for Common Lisp.
+***NOTE: The environment variable `EDITOR` is quite widely used (e.g. crontab -e, git commit...). So be careful with configuration.***
 
 ### %load [systems]...
 
