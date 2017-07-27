@@ -87,7 +87,7 @@ CL-USER>
 Some useful magic commands are available. All magic commands have name prefixed "%".
 
 ### %edit [file] (for SBCL only)
-Start editing the code with the text editor specified by the environment variable `EDITOR`. When [file] is not given, a temporary file will be created. Currently, supported for SBCL only.
+Start editing the code with the text editor specified by the environment variable `EDITOR`. When `[file]` is not given, a temporary file will be created. Currently, supported for SBCL only.
 
 We tested below editors.
 - emacs (recommended)
@@ -96,7 +96,8 @@ We tested below editors.
 - joe
 - nano
 
-We recommend to add the line `export EDITOR="emacs -nw -q"` to your `.bashrc`. We recommend [lem](https://github.com/cxxxr/lem) also, because it's very lightweight and highly optimized for Common Lisp.
+We recommend to add the line `export EDITOR="emacs -nw -q"` to your `.bashrc`. We recommend [lem](https://github.com/cxxxr/lem) also, because it's very lightweight and highly optimized for Common Lisp.  
+
 ***NOTE: The environment variable `EDITOR` is quite widely used (e.g. crontab -e, git commit...). So be careful with configuration.***
 
 ### %load [systems]...
@@ -105,11 +106,11 @@ Alias of `(ql:quickload systems... :silent t)`
 
 ### %save [file]
 
-Save input history into [file].
+Save input history into `[file]`.
 
 ### %time [expression]
 
-Measure execusion time of [expression].
+Measure execusion time of `[expression]`.
 
 ## Introspection (?[symbol's name])
 
