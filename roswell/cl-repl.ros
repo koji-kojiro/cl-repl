@@ -6,11 +6,7 @@ exec ros -Q -m cl-repl -L sbcl-bin -- $0 "$@"
 (progn ;;init forms
   (ros:ensure-asdf)
   (unless (find-package :cl-repl)
-    (ql:quickload :cl-repl :silent t))
-  #-cl-repl.siteinit
-  (load (merge-pathnames ".cl-repl/site-init.lisp" (user-homedir-pathname))
-        :if-does-not-exist nil)
-  (pushnew :cl-repl.siteinit *features*))
+    (ql:quickload :cl-repl :silent t)))
 
 (in-package :cl-repl)
 (ros:include "util")
