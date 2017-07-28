@@ -17,8 +17,7 @@
 	       #:inferior-shell
 	       #:trivial-timeout
 	       #:trivial-documentation
-	       #:split-sequence
-	       #-sbcl #:cffi)
+	       #:split-sequence)
   :components ((:module "src" :components ((:file "cl-repl"))))
   :description "A full-featured repl implementation."
   :long-description "A full-featured repl implementation.")
