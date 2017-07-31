@@ -74,11 +74,10 @@
 (defun debugger (condition)
   (print-condition condition)
   (format t
-          (cl-ansi-text:blue (bold "~a~%~a~%~a~%"))
+          (cl-ansi-text:blue (bold "~a~%~a~%~a~%~%"))
           "[0]: Try evaluating again."
           "[1]: Return to top level."
-	  #+sbcl (format nil "~a~%" "[2]: Edit code.")
-	  #-sbcl "")
+	  "[2]: Edit code.")
   (finish-output)
   (let ((last-input *last-input*))
     (loop
@@ -90,12 +89,12 @@
                                          (write-output
                                           (eval (read-from-string last-input))) (return)))
                                     (1 (return))
-                                    #+sbcl(2 (progn
-                                               (write-output
-						(if *file-to-open*
-						    (edit-magic (list *file-to-open*))
-						    (edit-magic nil :code last-input)))
-                                               (return)))
+                                    (2 (progn
+					 (write-output
+					  (if *file-to-open*
+					      (edit-magic (list *file-to-open*))
+					      (edit-magic nil :code last-input)))
+					 (return)))
                                     (t (write-output (eval input))))
                (error (condition)
                  (progn
@@ -168,24 +167,7 @@
         (cons (common-prefix els) els)
         els)))
 
-#+sbcl (rl:register-function :complete #'completer)
-#-sbcl (progn
-         (cffi:define-foreign-library readline
-             (:darwin (:or "libreadline.dylib"))
-           (:unix (:or "libreadline.so.6.3"
-                       "libreadline.so.6"
-                       "libreadline.so"))
-           (t (:default "libreadline")))
-         (cffi:use-foreign-library readline)
-         (setf rl::*attempted-completion-function*
-               (rl::produce-callback
-                (lambda (text start end)
-                  (prog1
-                      (rl::to-array-of-strings
-                       (funcall #'completer text start end))
-                    (setf rl::*attempted-completion-over* t)))
-                :pointer
-                (:string :int :int))))
+(rl:register-function :complete #'completer)
 
 (defun introspectionp (input)
   (alexandria:starts-with-subseq "?" input))
@@ -196,15 +178,12 @@
 (defun magic-commandp (input)
   (alexandria:starts-with-subseq "%" input))
 
-#+sbcl
 (defparameter *file-to-open* nil)
 
-#+sbcl
 (defun create-tmpfile (&optional (code nil))
   (cl-fad:with-output-to-temporary-file (tmp :template "/tmp/common-lisp-edit-%.lisp")
     (if code (princ code tmp))))
 
-#+sbcl
 (defun open-editor (filepath)
   (let ((editor (uiop:getenv "EDITOR")))
     (if (not editor)
@@ -217,7 +196,6 @@
     (let ((buf (make-string (file-length s))))
       (read-sequence buf s) buf)))
 
-#+sbcl
 (defun edit-magic (args &key (code nil))
   (if (first args)
       (setf *file-to-open* (first args))

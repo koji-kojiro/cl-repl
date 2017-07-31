@@ -1,11 +1,12 @@
 #!/bin/sh
 #|-*- mode:lisp -*-|#
 #| A repl implementation of Common Lisp
-exec ros -Q -- $0 "$@"
+exec ros -Q -L sbcl-bin -- $0 "$@"
 |#
 (progn ;;init forms
   (ros:ensure-asdf)
-  #+quicklisp (ql:quickload :cl-repl :silent t))
+  (unless (find-package :cl-repl)
+    (ql:quickload :cl-repl :silent t)))
 
 (in-package :cl-repl)
 (ros:include "util")
