@@ -1,9 +1,12 @@
 # CL-REPL - Common Lisp REPL for Roswell
 
-<!-- [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)<br> -->
+[![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/koji-kojiro/cl-repl/blob/master/LICENSE)
+[![GitHub tag](https://img.shields.io/github/tag/koji-kojiro/cl-repl.svg?style=flat)](https://github.com/koji-kojiro/cl-repl/releases)
+[![Quicklisp dist](http://quickdocs.org/badge/cl-repl.svg)](http://quickdocs.org/cl-repl/)
 
+<br>
 <p align="center">
-  <img src="image/cl-repl.gif">
+  <img src="https://github.com/koji-kojiro/cl-repl/blob/master/image/cl-repl.gif">
 </p>
 
 # Overview
@@ -12,22 +15,24 @@ CL-REPL is a full-featured repl implementation designed to work with **[Roswell]
 
 ## Features
 
-- Portable.<br>
-  Written as a **[Roswell script](https://github.com/roswell/roswell/wiki/2.-Roswell-as-a-Scripting-Environment)**.
 - Emacs-like key bindings.<br>
-  Provides powerful line editor on REPL.
 - Tab-completion.
 - Shell commands and magic commands.
 
 Of course, the other general features are available! (e.g. debugger)
 
-## Surpported Lisps
+# Requiremnets
+- [Roswell](https://github.com/roswell/roswell/)
+- Steel Bank Common Lisp (bundled to Roswell)
+- GNU Readline
 
-- Steel Bank Common Lisp (Recommended)
-- Clozure CL
-- Allegro CL
+If you are using Homebrew on MacOSX, you may need to link the library yourself as follows.
 
-We mainly target SBCL and CCL. It might work even on the other implementations, but not guarantied.
+```
+$ brew link --force readline
+```
+
+***[Note]:Since v.0.3.0, CCL and ACL are no longer supported. This means that CL-REPL always uses `sbcl-bin` even if you switch implementation using` ros use`.***<br>***[Note]:Terminal should support ANSI escapes.***
 
 # Installation
 
@@ -63,11 +68,11 @@ When a condition is caught by REPL, the debugger starts up. You can select a res
     The debugger will try to evaluating the code again.
 - [1]. Return to top level.
     The debugger will be aborted without re-evaluating the code.
-- [2]. Edit code. (Only for SBCL)
+- [2]. Edit code.
     The text editor specified by the environment variable `EDITOR` will start.
     You can rewrite code with the editor.
 
-## Shell commands (![commands]...)
+## Shell commands (`![commands]...`)
 
 If the line starts with "!", excute it as shell commnads.
 
@@ -84,35 +89,41 @@ CL-USER>
 
 ## Magic commands
 
-Some useful magic commands are available. All magic commands have name prefixed "%".
+Some useful magic commands are available. All magic commands have name prefixed `%`.
 
-### %edit [file] (for SBCL only)
-Start editing the code with the text editor specified by the environment variable `EDITOR`. When `[file]` is not given, a temporary file will be created. Currently, supported for SBCL only.
+### `%edit <file>`
+Start editing the code with the text editor specified by the environment variable `EDITOR`. When `<file>` is not given, a temporary file will be created.
 
-We tested below editors.
-- emacs (recommended)
-- lem (recommended)
-- vi
-- joe
-- nano
+We tested the following text editors.
 
-We recommend to add the line `export EDITOR="emacs -nw -q"` to your `.bashrc`. We recommend [lem](https://github.com/cxxxr/lem) also, because it's very lightweight and highly optimized for Common Lisp.  
+| Editor | Result |
+|:----------:|:-----------:|
+| GNU Emacs | OK! |
+| GNU Emacs (emacs -nw) | OK! (recommended)|
+| [lem](https://github.com/cxxxr/lem) | OK!  (recommended)|
+| vim | OK! |
+| Joe's own editor | OK! |
+| GNU nano | OK! |
+| Atom | NG... |
+| Sublime Text3 | NG... |
+
+We recommend to add the line `export EDITOR="emacs -nw -q"` to your `.bashrc`. We recommend [lem](https://github.com/cxxxr/lem) also, because it's very lightweight and highly optimized for Common Lisp.
 
 ***NOTE: The environment variable `EDITOR` is quite widely used (e.g. crontab -e, git commit...). So be careful with configuration.***
 
-### %load [systems]...
+### `%load <systems>...`
 
 Alias of `(ql:quickload systems... :silent t)`
 
-### %save [file]
+### `%save [file]`
 
 Save input history into `[file]`.
 
-### %time [expression]
+### `%time [expression]`
 
 Measure execusion time of `[expression]`.
 
-## Introspection (?[symbol's name])
+## Introspection (`?[symbol's name]`)
 
 IPython style introspection is available.
 
