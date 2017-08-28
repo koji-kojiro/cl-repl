@@ -3,7 +3,7 @@
   (:use #:cl))
 (in-package #:cl-repl)
 
-(defconstant +version+ :0.2.2)
+(defconstant +version+ :0.3.0)
 
 (defun bold (string)
   (format nil "~C[~Am~A~C[0m" (code-char #o33) "1" string (code-char #o33)))
