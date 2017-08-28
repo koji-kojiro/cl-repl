@@ -4,7 +4,7 @@
 (in-package :cl-repl)
 
 (defsystem cl-repl
-  :version "0.2.2"
+  :version "0.3.0"
   :author "TANI Kojiro"
   :license "MIT"
   :depends-on (#:alexandria
@@ -17,8 +17,7 @@
 	       #:inferior-shell
 	       #:trivial-timeout
 	       #:trivial-documentation
-	       #:split-sequence
-	       #-sbcl #:cffi)
+	       #:split-sequence)
   :components ((:module "src" :components ((:file "cl-repl"))))
   :description "A full-featured repl implementation."
   :long-description "A full-featured repl implementation.")
