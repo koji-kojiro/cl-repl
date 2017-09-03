@@ -9,40 +9,41 @@
   <img src="https://github.com/koji-kojiro/cl-repl/blob/master/image/cl-repl.gif">
 </p>
 
-# Overview
+# 概要
 
-CL-REPL is a full-featured repl implementation designed to work with **[Roswell](https://github.com/roswell/roswell/)**, which is strongly inspired by **[SLIME](https://github.com/slime/slime)** and **[IPython](https://github.com/ipython/ipython)**.
+CL-REPL は **[Roswell](https://github.com/roswell/roswell/)** と連携するように設計されたCommon Lispの多機能対話型開発環境です．  **[SLIME](https://github.com/slime/slime)** や **[IPython](https://github.com/ipython/ipython)** から非常に多くのアイデアを取り入れています.
 
-## Features
+## 特徴
 
-- Emacs-like key bindings.<br>
-- Tab-completion.
-- Shell commands and magic commands.
+- Emacs風のキーバインド．<br>
+- タブ補完．
+- シェルコマンドとマジックコマンド．
 
-Of course, the other general features are available! (e.g. debugger)
+その他の一般的な機能ももちろん実装されています．（デバッガなど）
 
-# Requiremnets
+# 要件
 - [Roswell](https://github.com/roswell/roswell/)
-- Steel Bank Common Lisp (bundled to Roswell)
+- Steel Bank Common Lisp (Roswellについてきます)
 - GNU Readline
 
-If you are using Homebrew on MacOSX, you may need to link the library yourself as follows.
+もしMacOSX上でHomebrewを使っている場合はご自身でライブラリをリンクする必要があるかもしれません．
+その場合以下を実行してください．
 
 ```
 $ brew link --force readline
 ```
 
-***[Note]:Since v.0.3.0, CCL and ACL are no longer supported. This means that CL-REPL always uses `sbcl-bin` even if you switch implementation using` ros use`.***<br>***[Note]:Terminal should support ANSI escapes.***
+***NOTE:v.0.3.0からCCLとACLはサポートされません. CL-REPLは常に`sbcl-bin`を用います．` ros use`による処理系の切り替えは無視されます．*** <br> ***NOTE:ANSIエスケープシーケンスをサポートした端末でのみ正常に動作します．*** 
 
-# Installation
+# インストール
 
-Via Roswell.<br>
+Roswellからインストールできます．<br>
 `$ ros install koji-kojiro/cl-repl`
 
-# Usage
+# 使い方
 `$ cl-repl`
 
-or,
+または，
 
 `$ ros repl`
 
@@ -60,21 +61,21 @@ Options:
 
 ```
 
-## debugger
-When a condition is caught by REPL, the debugger starts up. You can select a restart type from three kinds of candidates. Please enter the number corresponding to the desired restart type and hit enter key. You can also execute any codes before restarting.
+## デバッガ
+コンディションが補足されるとデバッガが起動します．三種類からリスタートを選択できます．対応する番号をタイプしてエンターキーを押してください．リスタートの前に任意のコードを実行することもできます．
 
-### Restart type
+### リスタートのタイプ
 - [0]. Try evaluating again.
-    The debugger will try to evaluating the code again.
+    デバッガは再度評価を試みます．
 - [1]. Return to top level.
-    The debugger will be aborted without re-evaluating the code.
+    デバッガは再評価を試みずに終了します．
 - [2]. Edit code.
-    The text editor specified by the environment variable `EDITOR` will start.
-    You can rewrite code with the editor.
+    環境変数`EDITOR`で指定されたテキストエディタが起動します．<br>
+    コードを再度編集することができます．
 
-## Shell commands (`![commands]...`)
+## シェルコマンド (`![commands]...`)
 
-If the line starts with "!", excute it as shell commnads.
+行頭が"!"であった場合，シェルコマンドとして実行されます．
 
 ```
 CL-USER> !ls
@@ -87,50 +88,50 @@ a.txt
 CL-USER>
 ```
 
-## Magic commands
+## マジックコマンド
 
-Some useful magic commands are available. All magic commands have name prefixed `%`.
+いくつかの有用なマジックコマンドが利用できます．すべてのマジックは`%`で始まる名前を持ちます.
 
 ### `%edit <file>`
-Start editing the code with the text editor specified by the environment variable `EDITOR`. When `<file>` is not given, a temporary file will be created.
+環境変数`EDITOR`で指定されたエディタが起動し編集を開始します．`<file>`が指定されていない場合は一時ファイルが作成されます．
 
-We tested the following text editors.
+以下のエディタで動作確認を行っています．
 
-| Editor | Result |
+| エディタ | 結果 |
 |:----------:|:-----------:|
 | GNU Emacs | OK! |
-| GNU Emacs (emacs -nw) | OK! (recommended)|
-| [lem](https://github.com/cxxxr/lem) | OK!  (recommended)|
+| GNU Emacs (emacs -nw) | OK! (おすすめ)|
+| [lem](https://github.com/cxxxr/lem) | OK!  (おすすめ)|
 | vim | OK! |
 | Joe's own editor | OK! |
 | GNU nano | OK! |
 | Atom | NG... |
 | Sublime Text3 | NG... |
 
-We recommend to add the line `export EDITOR="emacs -nw -q"` to your `.bashrc`. We recommend [lem](https://github.com/cxxxr/lem) also, because it's very lightweight and highly optimized for Common Lisp.
+おすすめは`export EDITOR="emacs -nw -q"`を`.bashrc`に追加しておくことです．あるいは[lem](https://github.com/cxxxr/lem)もおすすめです．軽量に動作し，Common Lispに高度に最適化されたエディタです．
 
-***NOTE: The environment variable `EDITOR` is quite widely used (e.g. crontab -e, git commit...). So be careful with configuration.***
+***NOTE: 環境変数`EDITOR`は非常に広く用いられています．慎重に設定してください．（例： crontab -e, git commit...）***
 
 ### `%load <systems>...`
 
-Alias of `(ql:quickload systems... :silent t)`
+`(ql:quickload systems... :silent t)`のエイリアスです．
 
 ### `%save [file]`
 
-Save input history into `[file]`.
+入力履歴を`[file]`に保存します．
 
 ### `%time [expression]`
 
-Measure execusion time of `[expression]`.
+`[expression]`の実行時間を計測します．
 
-## Introspection (`?[symbol's name]`)
+## イントロスペクション (`?[symbol's name]`)
 
-IPython style introspection is available.
+IPython風のイントロスペクションが利用可能です．
 
-# License
+# ライセンス
 
-CL-REPL is distributed under [MIT license](LICENSE).
+CL-REPLは[MITライセンス](LICENSE)のもとで頒布されます．
 
-# Author
+# 作者
 
 [TANI Kojiro](https://github.com/koji-kojiro) (kojiro0531@gmail.com)
