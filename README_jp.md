@@ -33,7 +33,8 @@ CL-REPL は **[Roswell](https://github.com/roswell/roswell/)** と連携する�
 $ brew link --force readline
 ```
 
-***NOTE:v.0.3.0からCCLとACLはサポートされません. CL-REPLは常に`sbcl-bin`を用います．` ros use`による処理系の切り替えは無視されます．*** <br> ***NOTE:ANSIエスケープシーケンスをサポートした端末でのみ正常に動作します．*** 
+***v.0.3.0からCCLとACLはサポートされません. CL-REPLは常に`sbcl-bin`を用います．` ros use`による処理系の切り替えは無視されます．*** <br> ***ANSIエスケープシーケンスをサポートした端末でのみ正常に動作します．*** 
+
 
 # インストール
 
@@ -65,11 +66,11 @@ Options:
 コンディションが補足されるとデバッガが起動します．三種類からリスタートを選択できます．対応する番号をタイプしてエンターキーを押してください．リスタートの前に任意のコードを実行することもできます．
 
 ### リスタートのタイプ
-- [0]. Try evaluating again.
+- [0]. Try evaluating again.<br>
     デバッガは再度評価を試みます．
-- [1]. Return to top level.
+- [1]. Return to top level.<br>
     デバッガは再評価を試みずに終了します．
-- [2]. Edit code.
+- [2]. Edit code.<br>
     環境変数`EDITOR`で指定されたテキストエディタが起動します．<br>
     コードを再度編集することができます．
 
@@ -110,7 +111,8 @@ CL-USER>
 
 おすすめは`export EDITOR="emacs -nw -q"`を`.bashrc`に追加しておくことです．あるいは[lem](https://github.com/cxxxr/lem)もおすすめです．軽量に動作し，Common Lispに高度に最適化されたエディタです．
 
-***NOTE: 環境変数`EDITOR`は非常に広く用いられています．慎重に設定してください．（例： crontab -e, git commit...）***
+***環境変数`EDITOR`は非常に広く用いられています．慎重に設定してください．（例： crontab -e, git commit...）***
+
 
 ### `%load <systems>...`
 
