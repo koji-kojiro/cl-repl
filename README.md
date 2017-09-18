@@ -3,11 +3,14 @@
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/koji-kojiro/cl-repl/blob/master/LICENSE)
 [![GitHub tag](https://img.shields.io/github/tag/koji-kojiro/cl-repl.svg?style=flat)](https://github.com/koji-kojiro/cl-repl/releases)
 [![Quicklisp dist](http://quickdocs.org/badge/cl-repl.svg)](http://quickdocs.org/cl-repl/)
+　:jp: [For Japanese](README_jp.md)
+
 
 <br>
 <p align="center">
   <img src="https://github.com/koji-kojiro/cl-repl/blob/master/image/cl-repl.gif">
 </p>
+
 
 # Overview
 
@@ -32,7 +35,8 @@ If you are using Homebrew on MacOSX, you may need to link the library yourself a
 $ brew link --force readline
 ```
 
-***[Note]:Since v.0.3.0, CCL and ACL are no longer supported. This means that CL-REPL always uses `sbcl-bin` even if you switch implementation using` ros use`.***<br>***[Note]:Terminal should support ANSI escapes.***
+***[Note]:Since v.0.3.0, CCL and ACL are no longer supported. This means that CL-REPL always uses `sbcl-bin` even if you switch implementation using` ros use`.***  
+***[Note]:Terminal should support ANSI escapes.***
 
 # Installation
 
@@ -132,7 +136,7 @@ IPython style introspection is available.
 CL-REPL is distributed under [MIT license](LICENSE).
 
 # Contributing
-Don't hesitate to open issues or to send pull requests!
+Don't hesitate to open issues or to send pull requests!  
 The authors are unfamiliar to Common Lisp, as well as English...
 
 # Author
