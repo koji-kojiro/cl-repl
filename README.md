@@ -131,6 +131,10 @@ IPython style introspection is available.
 
 CL-REPL is distributed under [MIT license](LICENSE).
 
+# Contributing
+Don't hesitate to open issues or to send pull requests!
+The authors are unfamiliar to Common Lisp, as well as English...
+
 # Author
 
 [TANI Kojiro](https://github.com/koji-kojiro) (kojiro0531@gmail.com)

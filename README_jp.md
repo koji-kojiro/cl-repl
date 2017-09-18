@@ -132,6 +132,11 @@ IPython風のイントロスペクションが利用可能です．
 
 CL-REPLは[MITライセンス](LICENSE)のもとで頒布されます．
 
+# Contributing
+
+プルリクエストやissueは常に大歓迎です．
+作者はCommon Lispにも英語にも大変不慣れです...
+
 # 作者
 
 [TANI Kojiro](https://github.com/koji-kojiro) (kojiro0531@gmail.com)
