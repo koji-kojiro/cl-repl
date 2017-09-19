@@ -24,7 +24,7 @@ CL-REPL is a full-featured repl implementation designed to work with **[Roswell]
 
 Of course, the other general features are available! (e.g. debugger)
 
-# Requiremnets
+# Requirements
 - [Roswell](https://github.com/roswell/roswell/)
 - Steel Bank Common Lisp (bundled to Roswell)
 - GNU Readline
