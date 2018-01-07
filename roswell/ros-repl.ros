@@ -46,6 +46,6 @@ Options:
       (progn
     	(format t "~a~%" +versions-string+)
     	(finish-output)
-    	(cl-replrepl))))
+    	(cl-repl:repl))))
 
 ;;; vim: set ft=lisp lisp:
