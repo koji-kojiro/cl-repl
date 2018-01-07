@@ -1,9 +1,10 @@
 (in-package #:cl-user)
 (defpackage #:cl-repl
-  (:use #:cl))
+  (:use #:cl)
+  (:export +version+ *splash* repl))
 (in-package #:cl-repl)
 
-(defconstant +version+ :0.3.1)
+(defconstant +version+ :0.3.2)
 
 (defun bold (string)
   (format nil "~C[~Am~A~C[0m" (code-char #o33) "1" string (code-char #o33)))

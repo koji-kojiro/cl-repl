@@ -8,7 +8,9 @@ exec ros -Q -m cl-repl -L sbcl-bin -- $0 "$@"
   (unless (find-package :cl-repl)
     (ql:quickload :cl-repl :silent t)))
 
-(in-package :cl-repl)
+(defpackage :ros.script.cl-repl.3724301384
+  (:use :cl))
+(in-package :ros.script.cl-repl.3724301384)
 (ros:include "util")
 
 (defconstant +usage+
@@ -28,7 +30,7 @@ Options:
 
 (defconstant +versions-string+
   (concatenate 'string
-	       (format nil "CL-REPL ~a - Common Lisp REPL for Roswell~%" +version+)
+	       (format nil "CL-REPL ~a - Common Lisp REPL for Roswell~%" cl-repl:+version+)
 	       (let ((impl (roswell.util:config "default.lisp")))
 		 (format nil "On Roswell ~a, ~a ~a~%"
 			 (ros::version)
@@ -41,12 +43,12 @@ Options:
   (if (first argv)
       (alexandria:switch ((first argv) :test #'equal)
                          ("--help" (format t +usage+))
-                         ("--version" (format t "~a~%" +version+))
-			 ("--load" (repl :load (first (last argv))))
+                         ("--version" (format t "~a~%" cl-repl:+version+))
+			 ("--load" (cl-repl:repl :load (first (last argv))))
                          (t (format t "~a~%" +short-usage+)))
       (progn
-        (format t "~a~%" (concatenate 'string *splash* +versions-string+))
+        (format t "~a~%" (concatenate 'string cl-repl:*splash* +versions-string+))
         (finish-output)
-        (repl))))
+        (cl-repl:repl))))
 
 ;;; vim: set ft=lisp lisp:
