@@ -14,7 +14,7 @@ os:
 
 install:
   - curl -L https://raw.githubusercontent.com/roswell/roswell/release/scripts/install-for-ci.sh | sh
-  - ros install koji-kojiro/lem
+  - ros install koji-kojiro/cl-repl
 
 script:
   - ros -s cl-repl
