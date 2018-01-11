@@ -1,0 +1,20 @@
+language: common-lisp
+sudo: false
+
+env:
+  global:
+    - PATH: ~/.roswell/bin:$PATH
+    - ROSWELL_INSTALL_DIR: $HOME/.roswell
+  matrix:
+    - LISP=sbcl-bin
+
+os:
+  - osx
+  - linux
+
+install:
+  - curl -L https://raw.githubusercontent.com/roswell/roswell/release/scripts/install-for-ci.sh | sh
+  - ros install koji-kojiro/cl-repl
+
+script:
+  - ros -s cl-repl
