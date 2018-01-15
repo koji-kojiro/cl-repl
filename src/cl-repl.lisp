@@ -45,9 +45,9 @@
               repeat (1- (length prompt))
               collect "."))))
 
-(defun read-input (&key (prompt (prompt)))
+(defun read-input (&key (prompt (prompt)) (add-history t))
   (handler-case
-      (let ((input (rl:readline :prompt (bold (cl-ansi-text:green prompt)) :add-history t)))
+      (let ((input (rl:readline :prompt (bold (cl-ansi-text:green prompt)) :add-history add-history)))
         (if (not input)
               (exit-with-prompt)
             (setf *last-input* input)))
@@ -90,7 +90,7 @@
   (let ((last-input *last-input*))
     (loop
        (handler-case
-           (let ((input (read-input :prompt "DEBUG> ")))
+           (let ((input (read-input :prompt "DEBUG> " :add-history nil)))
              (handler-case
                  (alexandria:switch (input)
                                     (0 (progn
