@@ -140,6 +140,8 @@ CL-REPL is distributed under [MIT license](LICENSE).
 Don't hesitate to open issues or to send pull requests!  
 The authors are unfamiliar to Common Lisp, as well as English...
 
+To test locally, you can build an executable with `make build`.
+
 # Author
 
 [TANI Kojiro](https://github.com/koji-kojiro) (kojiro0531@gmail.com)
