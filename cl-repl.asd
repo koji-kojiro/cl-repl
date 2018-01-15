@@ -4,7 +4,7 @@
 (in-package :cl-repl)
 
 (defsystem cl-repl
-  :version "0.3.2"
+  :version "0.3.3"
   :author "TANI Kojiro"
   :license "MIT"
   :depends-on (#:alexandria
