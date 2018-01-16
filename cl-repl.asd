@@ -19,5 +19,8 @@
 	       #:trivial-documentation
 	       #:split-sequence)
   :components ((:module "src" :components ((:file "cl-repl"))))
+  :build-operation "program-op"
+  :build-pathname "cl-repl"
+  :entry-point "cl-repl:repl"
   :description "A full-featured repl implementation."
   :long-description "A full-featured repl implementation.")

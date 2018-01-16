@@ -169,7 +169,6 @@
         (cons (common-prefix els) els)
         els)))
 
-(rl:register-function :complete #'completer)
 
 (defun introspectionp (input)
   (alexandria:starts-with-subseq "?" input))
@@ -298,6 +297,9 @@
 
 (defun repl (&key (load nil))
   (in-package :cl-user)
+
+  (rl:register-function :complete #'completer)
+
   (macrolet ((print-with-handler (&rest body)
 	       `(handler-case
 		    (write-output ,@body)
