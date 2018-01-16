@@ -4,7 +4,7 @@
   (:export +version+ *splash* repl))
 (in-package #:cl-repl)
 
-(defconstant +version+ :0.3.2)
+(defconstant +version+ :0.3.3)
 
 (defun bold (string)
   (format nil "~C[~Am~A~C[0m" (code-char #o33) "1" string (code-char #o33)))
@@ -27,11 +27,12 @@
 (defun exit-with-prompt ()
   (finish-output)
   (alexandria:switch
-   ((rl:readline :prompt "Do you really want to exit ([y]/n)? ") :test #'equal)
-   ("y" (error 'exit-error))
-   (nil (progn (format t "~%") (error 'exit-error)))
-   ("n" (setf *last-input* "nil"))
-   (t (exit-with-prompt))))
+      ((rl:readline :prompt "Do you really want to exit ([y]/n)? ") :test #'equal)
+    ("y" (error 'exit-error))
+    ("" (error 'exit-error))
+    (nil (progn (format t "~%") (error 'exit-error)))
+    ("n" (setf *last-input* "nil"))
+    (t (exit-with-prompt))))
 
 (defun prompt ()
   (format nil "~a> " (car (package-nicknames *package*))))
