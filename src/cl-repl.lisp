@@ -27,10 +27,10 @@
 (defun exit-with-prompt ()
   (finish-output)
   (alexandria:switch
-      ((rl:readline :prompt "Do you really want to exit ([y]/n)? ") :test #'equal)
+      ((rl:readline :prompt (format nil  "~%Do you really want to exit ([y]/n)? ")) :test #'equal)
     ("y" (error 'exit-error))
     ("" (error 'exit-error))
-    (nil (progn (format t "~%") (error 'exit-error)))
+    (nil (error 'exit-error))
     ("n" (setf *last-input* "nil"))
     (t (exit-with-prompt))))
 
@@ -46,12 +46,18 @@
               collect "."))))
 
 (defun read-input (&key (prompt (prompt)) (add-history t))
-  (let ((input (rl:readline :prompt (bold (cl-ansi-text:green prompt)) :add-history add-history)))
-    (if (not input)
-        (progn
-          (format t "~%")
-          (exit-with-prompt))
-        (setf *last-input* input)))
+  (handler-case
+      (let ((input (rl:readline :prompt (bold (cl-ansi-text:green prompt)) :add-history add-history)))
+        (if (not input)
+            (exit-with-prompt)
+            (setf *last-input* input)))
+    (#+sbcl sb-sys:interactive-interrupt
+      #+ccl  ccl:interrupt-signal-condition
+      #+clisp system::simple-interrupt-condition
+      #+ecl ext:interactive-interrupt
+      #+allegro excl:interrupt-signal
+      () (exit-with-prompt)))
+
   (loop
      (let ((left (count "(" *last-input* :test #'string-equal))
            (right (count ")" *last-input* :test #'string-equal)))
