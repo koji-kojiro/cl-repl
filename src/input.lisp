@@ -8,7 +8,7 @@
 
 (defvar *default-prompt-function*
   #'(lambda ()
-        (format nil "~a> " (current-package))))
+      (format nil "~a> " (current-package))))
 
 (defvar *debugger-prompt-function*
   #'(lambda () (format nil "[~a]> " *debugger-level*)))
@@ -18,14 +18,14 @@
                               *default-prompt-function*
                               *debugger-prompt-function*))
          (color (if (zerop *debugger-level*)
-                     *default-prompt-color*
-                     *debugger-prompt-color*))
+                    *default-prompt-color*
+                    *debugger-prompt-color*))
          (prompt-string (funcall prompt-function)))
     (if multiline-p
-      (setf prompt-string
-        (format nil "~V@{.~}" (1- (length prompt-string)) :dummy)))
+        (setf prompt-string
+              (format nil "~V@{.~}" (1- (length prompt-string)) :dummy)))
     (color color prompt-string)))
- 
+
 (defun line-continue-p (string)
   (let ((retval nil))
     (handler-case (read-from-string string)
