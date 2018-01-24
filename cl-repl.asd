@@ -11,6 +11,7 @@
   :serial t
   :components ((:module "src" :components ((:file "package")
                                            (:file "color")
+                                           (:file "command")
                                            (:file "completer")
                                            (:file "debugger")
                                            (:file "input")
