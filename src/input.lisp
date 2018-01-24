@@ -49,10 +49,10 @@
     (check-input input))
   (loop
     (if (line-continue-p *last-input*)
-        (setf *last-input*
-              (format nil "~a~%~a"
-                      *last-input*
-                      (read-input1 :multiline-p t)))
-        (return)))
-  (read-from-string *last-input*))
+        (let ((input (read-input1 :multiline-p t)))
+          (when (null input)
+            (terpri)
+            (return-from read-input nil))
+          (setf *last-input* (format nil "~a~%~a" *last-input* input)))
+        (return-from read-input (read-from-string *last-input*)))))
 
