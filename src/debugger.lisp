@@ -24,10 +24,10 @@
 
 (defun get-backtrace (condition)
   (split-sequence:split-sequence #\NEWLINE
-                                 (with-output-to-string (out)
-                                   (uiop/image:print-backtrace
-                                    :stream out
-                                    :condition condition))))
+                                   (trivial-backtrace:print-backtrace
+                                    condition
+                                    :output nil)
+                                 :remove-empty-subseqs t))
 
 (defun print-backtrace (condition n)
   (finish-output)
