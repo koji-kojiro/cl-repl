@@ -14,8 +14,8 @@
     ("n" (setf *last-input* "nil"))
     (t (exit-with-prompt))))
 
-(defun print-result (value)
-  (format t "~&~a ~s~%" (color *output-indicator-color* "[OUT]:") value)
+(defun print-result (values)
+  (format t "~&~a~{ ~s~}~%" (color *output-indicator-color* "[OUT]:") values)
   (finish-output)) 
 
 (let (* ** *** - + ++ +++ / // /// values)
@@ -27,16 +27,16 @@
     (setq +++ ++ /// //     *** (car ///)
           ++  +  //  /      **  (car //)
           +   -  /   values *   (car /))
-    (print-result (car values)))
-  (defun repl (&rest args)
+    (print-result  values))
+  (defun repl (&rest argss)
     (in-package :cl-user)
     (loop :with args := nil :do
-             (setf *debugger-level* 0)
-             (handler-case
-                 (progn
-                   (with-simple-restart (*abort "Return to CL-REPL's top level.")
-                     (multiple-value-setq (- args) (read-input))
-                     (eval-print -)))
-               (exit-error () (return))))))
+          (setf *debugger-level* 0)
+          (handler-case
+            (restart-case
+              (eval-print (setq - (read-input)))
+              (*abort () :report "Return to CL-REPL's top level.")
+              (*retry () :report "Try to evaluate again." (eval-print -)))
+            (exit-error () (return))))))
 
 
