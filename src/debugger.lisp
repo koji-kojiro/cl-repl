@@ -37,7 +37,7 @@
           while (< i 5)
           do (format t (color *backtrace-color* " ~a~%") b)
           initially (format t (color *section-color* "~%backtrace:~%"))
-          finally (format t " --more-- (type ~d)~%" n))))
+          finally (format t (color *backtrace-color*" --more-- (type ~d)~%") n))))
 
 (defun debugger (condition me-or-my-encapsulation)
   (incf *debugger-level*)
