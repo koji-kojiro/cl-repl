@@ -1,50 +1,50 @@
 (in-package :cl-repl)
 
-(defun debugger-loop (choices condition)
-  (format t (color *section-color* "~%restarts:~%"))
-  (let ((n (length choices)) (i))
-    (do ((c choices (cdr c)) (i 0 (+ i 1)))
-        ((null c))
-      (format t (color *restart-candidates-color* "~2d. [~a] ~a~%") i (restart-name (car c)) (car c)))
-    (print-backtrace condition n)
-    (terpri)
-    (loop
-      (let ((input (read-input)))
-        (if (typep input `(integer 0 ,n))
-            (progn
-              (setf i input)
-              (if (= i n)
-                  (progn (show-backtrace condition))
-                  (return)))
-            (eval-print input))))
-    (find-restart (nth i choices))))
+(defun debugger-banner ()
+   (format t (color *condition-color* "~a~%  [Condition of type ~a]~2%")
+            *current-condition* (type-of *current-condition*))
+   (format t (color *section-color* "Restarts:~%"))
+   (loop :with choices = *invokable-restarts*
+         :for choice :in choices
+         :for n :to (length choices)
+         :do (format t "~2d: [~a] ~a~%"  n (restart-name choice) choice))
+   (terpri)
+   (format t (color *section-color* "Usage:~%"))
+   (format t "  Ctrl+r: select restart. Ctrl+t: show backtrace.~2%"))
 
-(defun show-backtrace (condition)
-  (trivial-backtrace:print-backtrace condition))
+(defvar *current-condition*)
+(defvar *invokable-restarts*)
+(defvar *selected-restart* nil)
 
-(defun get-backtrace (condition)
-  (split-sequence:split-sequence #\NEWLINE
-                                   (trivial-backtrace:print-backtrace
-                                    condition
-                                    :output nil)
-                                 :remove-empty-subseqs t))
+(defun debugger (condition hook)
+  (setf *current-condition* condition)
+  (setf *invokable-restarts* (compute-restarts condition))
+  (debugger-banner)
+  (let ((*debugger-hook* hook))
+    (repl :level (1+ *debugger-level*) :keymap "debugger")
+    (invoke-restart-interactively (or *selected-restart* '*abort))))
 
-(defun print-backtrace (condition n)
+(defun invoke-restart-by-number (args key)
+  (declare (ignore args key))
+  (format t "~%Restart number: ")
   (finish-output)
-  (let ((backtrace (get-backtrace condition)))
-    (loop for b in backtrace
-          for i from 0
-          while (< i 5)
-          do (format t (color *backtrace-color* " ~a~%") b)
-          initially (format t (color *section-color* "~%backtrace:~%"))
-          finally (format t (color *backtrace-color*" --more-- (type ~d)~%") n))))
+  (let ((rl:*done* t))
+    (setf n (digit-char-p (rl:read-key))))  
+  (if (null n)
+      (format t "~%Please input number.~%")
+      (progn
+        (terpri)
+        (setf *selected-restart*
+          (find-restart (nth n *invokable-restarts*)))
+        (throw *debugger-level* nil))))
 
-(defun debugger (condition me-or-my-encapsulation)
-  (incf *debugger-level*)
-  (format t (color *condition-color* "~a~%  [Condition of type ~a]~%") condition (type-of condition))
-  (let ((restart (debugger-loop (compute-restarts) condition)))
-    (if (not restart) (error "The debugger got an error."))
-    (let ((*debugger-hook* me-or-my-encapsulation))
-      (decf *debugger-level*)
-      (invoke-restart-interactively restart))))
+(defun show-backtrace (args key)
+  (declare (ignore args key))
+  (terpri)
+  (trivial-backtrace:print-backtrace *current-condition*)
+  (setf rl:*done* t))
+
+(define-keymap "debugger" ()
+  ("\\C-r" #'invoke-restart-by-number)
+  ("\\C-t" #'show-backtrace))
 
