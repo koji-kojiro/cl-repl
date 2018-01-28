@@ -1,16 +1,16 @@
 (in-package :cl-repl)
 
 (defun debugger-banner ()
-   (format t (color *condition-color* "~a~%  [Condition of type ~a]~2%")
-            *current-condition* (type-of *current-condition*))
-   (format t (color *section-color* "Restarts:~%"))
-   (loop :with choices = *invokable-restarts*
-         :for choice :in choices
-         :for n :to (length choices)
-         :do (format t "~2d: [~a] ~a~%"  n (restart-name choice) choice))
-   (terpri)
-   (format t (color *section-color* "Usage:~%"))
-   (format t "  Ctrl+r: select restart. Ctrl+t: show backtrace.~2%"))
+  (format t (color *condition-color* "~a~%  [Condition of type ~a]~2%")
+          *current-condition* (type-of *current-condition*))
+  (format t (color *section-color* "Restarts:~%"))
+  (loop :with choices = *invokable-restarts*
+        :for choice :in choices
+        :for n :to (length choices)
+        :do (format t "~2d: [~a] ~a~%"  n (restart-name choice) choice))
+  (terpri)
+  (format t (color *section-color* "Usage:~%"))
+  (format t "  Ctrl+r: select restart. Ctrl+t: show backtrace.~2%"))
 
 (defvar *current-condition*)
 (defvar *invokable-restarts*)
@@ -35,7 +35,7 @@
       (progn
         (terpri)
         (setf *selected-restart*
-          (find-restart (nth n *invokable-restarts*)))
+              (find-restart (nth n *invokable-restarts*)))
         (throw *debugger-level* nil))))
 
 (defun show-backtrace (args key)

@@ -9,9 +9,9 @@
        (setf ,keymap (rl:copy-keymap (or (find-keymap ,parent) *rl-default-keymap*)))
        (loop :for (key func) :in ',bindings
              :when (stringp key)
-                   :do (rl:bind-keyseq key (eval func) :keymap ,keymap)
+             :do (rl:bind-keyseq key (eval func) :keymap ,keymap)
              :when (characterp key)
-                   :do (rl:bind-key key (eval func) :keymap ,keymap))
+             :do (rl:bind-key key (eval func) :keymap ,keymap))
        (setf (gethash ,name *keymaps*) ,keymap))))
 
 (defun unbind-key (args key)

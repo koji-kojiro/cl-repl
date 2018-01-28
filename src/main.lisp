@@ -31,10 +31,10 @@
        ,@body)))
 
 (opts:define-opts
-    (:name :help
-     :description "Print this help and exit."
-     :short #\h
-     :long "help")
+  (:name :help
+   :description "Print this help and exit."
+   :short #\h
+   :long "help")
   (:name :version
    :description "Show the version info and exit."
    :short #\v
@@ -43,17 +43,17 @@
 (defun main (&optional argv &key (show-logo t))
   (multiple-value-bind (options free-args)
       (handler-case
-        (if argv (opts:get-opts argv) (opts:get-opts))
+          (if argv (opts:get-opts argv) (opts:get-opts))
         (error ()
           (format t "try `cl-repl --help`.~&")
           (uiop:quit 1)))
     (when-option (options :help)
-                 (opts:describe
-                  :prefix "A full-featured Common Lisp REPL implementation.")
-                 (uiop:quit 0))
+      (opts:describe
+       :prefix "A full-featured Common Lisp REPL implementation.")
+      (uiop:quit 0))
     (when-option (options :version)
-                 (format t "cl-repl v~a~&" +version+)
-                 (uiop:quit 0)))
+      (format t "cl-repl v~a~&" +version+)
+      (uiop:quit 0)))
   (when show-logo
     (format t (color *logo-color* *logo*)))
   (format t "~a~%~a~2%" *versions* *copy*)
