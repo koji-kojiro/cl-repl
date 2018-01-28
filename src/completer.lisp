@@ -63,21 +63,3 @@
         (cons (common-prefix els) els)
         els)))
 
-#+sbcl (rl:register-function :complete #'completer)
-#-sbcl (progn
-         (cffi:define-foreign-library readline
-           (:darwin (:or "libreadline.dylib"))
-           (:unix (:or "libreadline.so.6.3"
-                   "libreadline.so.6"
-                   "libreadline.so"))
-           (t (:default "libreadline")))
-         (cffi:use-foreign-library readline)
-         (setf rl::*attempted-completion-function*
-               (rl::produce-callback
-                (lambda (text start end)
-                  (prog1
-                      (rl::to-array-of-strings
-                       (funcall #'completer text start end))
-                    (setf rl::*attempted-completion-over* t)))
-                :pointer
-                (:string :int :int))))

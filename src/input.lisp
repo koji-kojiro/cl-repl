@@ -11,7 +11,7 @@
       (format nil "~a> " (current-package))))
 
 (defvar *debugger-prompt-function*
-  #'(lambda () (format nil "[~a]> " *debugger-level*)))
+  #'(lambda () (format nil "[~a]~a> " *debugger-level* (current-package))))
 
 (defun prompt (&key (multiline-p nil))
   (let* ((prompt-function (if (zerop *debugger-level*)
@@ -27,14 +27,22 @@
     (color color prompt-string)))
 
 (defun line-continue-p (string)
-  (let ((retval nil))
+  (let ((retval))
     (handler-case (read-from-string string)
       (error () (setf retval t)))
     retval))
 
 (defun check-input (input)
+  (when (input-magic-p input)
+    (setf *last-input*
+      (apply #'invoke-magic
+             (split-sequence:split-sequence
+               #\SPACE
+               input
+               :remove-empty-subseqs t)))
+    (return-from check-input))
   (alexandria:switch
-      (input :test #'equal)
+    (input :test #'equal)
     ("" (setf *last-input* "nil"))
     (nil (progn (format t "~%") (exit-with-prompt)))
     (t (setf *last-input* input))))
@@ -42,7 +50,8 @@
 (defun read-input1 (&key (multiline-p nil))
   (finish-output)
   (rl:readline :prompt (prompt :multiline-p multiline-p)
-               :add-history (zerop *debugger-level*)))
+;                :add-history (zerop *debugger-level*)))
+               :add-history t))
 
 (defun read-input ()
   (let ((input (read-input1)))

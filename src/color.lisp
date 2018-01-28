@@ -7,10 +7,9 @@
 
 (defparameter *default-prompt-color* 40)
 (defparameter *debugger-prompt-color* 9)
+(defparameter *logo-color* 9)
 (defparameter *output-indicator-color* 9)
 (defparameter *splash-color* 9)
 (defparameter *condition-color* 9)
-(defparameter *restart-candidates-color* 248)
-(defparameter *backtrace-color* 248)
 (defparameter *section-color* 21)
 (defparameter *message-color* 248)
