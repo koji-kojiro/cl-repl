@@ -13,7 +13,7 @@
 
 (defvar *versions*
   #+ros.script
-  (format nil "ver. ~a on ~?~a ~a"
+  (format nil "cl-repl ~a on ~?~a ~a"
     +version+
     #+ros.script
     "Roswell ~a, "
@@ -57,6 +57,7 @@
   (when show-logo
     (format t (color *logo-color* *logo*)))
   (format t "~a~%~a~2%" *versions* *copy*)
+  #+sbcl (sb-ext:enable-debugger)
   (rl:register-function :complete #'completer)
   (repl)
   (rl:deprep-terminal))
