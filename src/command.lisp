@@ -64,3 +64,7 @@
               (error () (message-from-magic "Failed to load system.: ~a~&" system))))
   "nil")
 
+(define-magic package (&optional (package "cl-user") &rest args)
+  (declare (ignore args))
+  (handler-case (progn (setf *package* (find-package (read-from-string package))) "nil")
+    (error () (message-from-magic "Failed to change package."))))
