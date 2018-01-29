@@ -29,6 +29,7 @@
                     :output :interactive)
   (message-from-magic "Executing edited code...~%")
   (let ((code (alexandria:read-file-into-string filename)))
+    (setf code (format nil "(progn ~a)" code))
     (if (line-continue-p code)
         (message-from-magic  "Error: Unexpected EOF.")
         code)))
