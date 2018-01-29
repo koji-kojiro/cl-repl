@@ -22,19 +22,26 @@
 (defun input-magic-p (&optional input)
   (alexandria:starts-with-subseq "%" input))
 
-(defun edit-file-and-read (editor filename)
-  (message-from-magic "Openning file: ~a~%" filename)
-  (uiop:run-program `(,editor ,filename)
-                    :input :interactive
-                    :output :interactive)
-  (message-from-magic "Executing edited code...~%")
+(defun read-from-file (filename)
+  (unless (probe-file filename)
+    (return-from read-from-file
+      (message-from-magic "Error: File not found.")))
   (let ((code (alexandria:read-file-into-string filename)))
     (setf code (format nil "(progn ~a)" code))
     (if (line-continue-p code)
         (message-from-magic  "Error: Unexpected EOF.")
         code)))
 
-(define-magic edit (&optional filename)
+(defun edit-file-and-read (editor filename)
+  (message-from-magic "Openning file: ~a~%" filename)
+  (uiop:run-program `(,editor ,filename)
+                    :input :interactive
+                    :output :interactive)
+  (message-from-magic "Executing edited code...~%")
+  (read-from-file (pathname filename)))
+
+(define-magic edit (&optional filename &rest args)
+  (declare (ignore args))
   (let ((editor (uiop:getenv "EDITOR")))
     (if (null filename)
         (uiop:with-temporary-file
@@ -45,3 +52,15 @@
           (close s)
           (edit-file-and-read editor filename))
         (edit-file-and-read editor filename))))
+
+(define-magic run (filename &rest args)
+  (declare (ignore args))
+  (read-from-file (pathname filename)))
+
+#+quicklisp
+(define-magic load (&rest systems)
+  (loop :for system :in systems
+        :do (handler-case (ql:quickload (intern system) :silent t)
+              (error () (message-from-magic "Failed to load system.: ~a~&" system))))
+  "nil")
+
