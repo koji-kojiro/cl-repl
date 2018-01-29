@@ -35,7 +35,6 @@
     (*retry () :report "Try evaluating again." (eval-print -))))
 
 (defun repl (&key package (level 0) (keymap "default"))
-  (when (null package) (in-package :cl-user))
   (loop :with *debugger-level* := level
         :do (set-keymap keymap)
         :while (catch level (read-eval-print))))
