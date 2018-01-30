@@ -3,9 +3,13 @@
 (defvar *magic-commands* nil)
 
 (defmacro define-magic (name args &body body)
-  `(push (list ,(format nil "%~(~a~)" name)
-               #'(lambda ,args ,@body))
-         *magic-commands*))
+  `(progn
+     #+sbcl
+     (sb-ext:without-package-locks
+       (export (intern ,(format nil "%~a" name) :cl) :cl))
+     (push (list ,(format nil "%~(~a~)" name)
+                 #'(lambda ,args ,@body))
+           *magic-commands*)))
 
 (defmacro message-from-magic (message &rest args)
   `(progn
