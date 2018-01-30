@@ -28,7 +28,7 @@
 (defun completer (text start end)
   (declare (ignore start end))
   (if (string-equal text "")
-      (return-from completer '(" ")))
+      (return-from completer '("")))
   (let ((text (string-upcase text))
         (els))
     (flet ((body (sym text prefix)
