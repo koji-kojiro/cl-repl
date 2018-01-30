@@ -13,10 +13,9 @@
      "nil"))
 
 (defun invoke-magic (magic &rest args)
-  (loop for (name body) in *magic-commands* do
-           (when (string= name magic)
-             (return-from invoke-magic
-               (apply body args))))
+  (loop :for (name body) :in *magic-commands*
+        :when (string= name magic)
+        :do (return-from invoke-magic  (apply body args)))
   (message-from-magic "Command not found.: ~a" magic))
 
 (defun input-magic-p (&optional input)
@@ -41,6 +40,7 @@
   (read-from-file (pathname filename)))
 
 (define-magic edit (&optional filename &rest args)
+  "Edit code with text editor specified by $EDITOR."
   (declare (ignore args))
   (let ((editor (uiop:getenv "EDITOR")))
     (if (null filename)
@@ -54,17 +54,28 @@
         (edit-file-and-read editor filename))))
 
 (define-magic run (filename &rest args)
+  "Execute file in current enviroment."
   (declare (ignore args))
   (read-from-file (pathname filename)))
 
 #+quicklisp
 (define-magic load (&rest systems)
+  "Alias to (ql:quickload '(<system>...) :silent t)."
   (loop :for system :in systems
         :do (handler-case (ql:quickload (intern system) :silent t)
               (error () (message-from-magic "Failed to load system.: ~a~&" system))))
   "nil")
 
 (define-magic package (&optional (package "cl-user") &rest args)
+  "Alias to (in-pacakge <package>)."
   (declare (ignore args))
   (handler-case (progn (setf *package* (find-package (read-from-string package))) "nil")
     (error () (message-from-magic "Failed to change package."))))
+
+(define-magic help (&rest args)
+  "List available magic commands and usages."
+  (declare (ignore args))
+  (loop :for (name body) :in *magic-commands*
+        :do (format t "~16,,a~a~%" name (documentation body 'function)))
+  "nil")
+
