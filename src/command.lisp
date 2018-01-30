@@ -14,6 +14,7 @@
 (defmacro message-from-magic (message &rest args)
   `(progn
      (format t ,(color *message-color* message) ,@args)
+     (finish-output)
      "nil"))
 
 (defun invoke-magic (magic &rest args)
@@ -25,23 +26,21 @@
 (defun input-magic-p (&optional input)
   (alexandria:starts-with-subseq "%" input))
 
-(defun read-from-file (filename)
-  (unless (probe-file filename)
-    (return-from read-from-file
+(define-magic run (filename &rest args)
+  "Execute file in current enviroment."
+  (declare (ignore args))
+  (if (probe-file filename)
+      (format nil "(progn ~a )"
+              (alexandria:read-file-into-string filename))
       (message-from-magic "Error: File not found.")))
-  (let ((code (alexandria:read-file-into-string filename)))
-    (setf code (format nil "(progn ~a)" code))
-    (if (line-continue-p code)
-        (message-from-magic  "Error: Unexpected EOF.")
-        code)))
 
 (defun edit-file-and-read (editor filename)
   (message-from-magic "Openning file: ~a~%" filename)
   (uiop:run-program `(,editor ,filename)
                     :input :interactive
                     :output :interactive)
-  (message-from-magic "Executing edited code...~%")
-  (read-from-file (pathname filename)))
+  (message-from-magic "Evaluating edited code...~%")
+  (invoke-magic "%run" filename))
 
 (define-magic edit (&optional filename &rest args)
   "Edit code with text editor specified by $EDITOR."
@@ -57,10 +56,12 @@
           (edit-file-and-read editor filename))
         (edit-file-and-read editor filename))))
 
-(define-magic run (filename &rest args)
-  "Execute file in current enviroment."
-  (declare (ignore args))
-  (read-from-file (pathname filename)))
+(define-magic time (&rest forms)
+  "Alias to (time <form>)."
+  (let ((code (format nil "(time ~{ ~a~})" forms)))
+    (if (line-continue-p code)
+        (message-from-magic "Error: Unexpected EOF.")
+        code)))
 
 #+quicklisp
 (define-magic load (&rest systems)
