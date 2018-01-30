@@ -56,6 +56,17 @@
           (edit-file-and-read editor filename))
         (edit-file-and-read editor filename))))
 
+(define-magic cd (&optional (dest (uiop:getenv "HOME")) &rest args)
+  "Change working directory."
+  (declare (ignore args))
+  (handler-case
+      (progn
+        (setf dest (truename dest))
+        (uiop:chdir dest)
+        (setf *default-pathname-defaults* dest)
+        (format nil "~s"dest))
+    (error () (message-from-magic "No such directory."))))
+
 (define-magic time (&rest forms)
   "Alias to (time <form>)."
   (let ((code (format nil "(time ~{ ~a~})" forms)))
