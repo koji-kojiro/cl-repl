@@ -13,6 +13,7 @@
                                            (:file "color")
                                            (:file "keymap")
                                            (:file "command")
+                                           (:file "shell")
                                            (:file "completer")
                                            (:file "debugger")
                                            (:file "input")

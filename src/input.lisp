@@ -41,6 +41,10 @@
                   input
                   :remove-empty-subseqs t)))
     (return-from check-input))
+  (when (shell-command-p input)
+    (setf *last-input* "nil")
+    (run-shell-command input)
+    (return-from check-input))
   (alexandria:switch
       (input :test #'equal)
     ("" (setf *last-input* "nil"))
