@@ -1,23 +1,23 @@
-(in-package :cl-user)
-(defpackage cl-repl
-  (:use #:cl #:asdf))
-(in-package :cl-repl)
-
 (defsystem cl-repl
-  :version "0.3.3"
+  :version "0.4.0"
   :author "TANI Kojiro"
   :license "MIT"
   :depends-on (#:alexandria
-	       #:uiop
-	       #:cl-fad
-	       #:cl-ppcre
-	       #:cl-ansi-text
-	       #:cl-readline
-	       #:alexandria
-	       #:inferior-shell
-	       #:trivial-timeout
-	       #:trivial-documentation
-	       #:split-sequence)
-  :components ((:module "src" :components ((:file "cl-repl"))))
+               #:uiop
+               #:unix-opts
+               #:split-sequence
+               #:trivial-backtrace
+               #:cl-readline)
+  :serial t
+  :components ((:module "src" :components ((:file "package")
+                                           (:file "color")
+                                           (:file "keymap")
+                                           (:file "command")
+                                           (:file "shell")
+                                           (:file "completer")
+                                           (:file "debugger")
+                                           (:file "input")
+                                           (:file "repl")
+                                           (:file "main"))))
   :description "A full-featured repl implementation."
   :long-description "A full-featured repl implementation.")

@@ -11,6 +11,9 @@ env:
 os:
   - osx
   - linux
+  
+before_install:
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew link --force readline; fi
 
 install:
   - curl -L https://raw.githubusercontent.com/roswell/roswell/release/scripts/install-for-ci.sh | sh

@@ -1,145 +1,92 @@
-# CL-REPL - Common Lisp REPL for Roswell
-
+# CL-REPL
 [![Build Status](https://travis-ci.org/koji-kojiro/cl-repl.svg?branch=master)](https://travis-ci.org/koji-kojiro/cl-repl)
-[![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/koji-kojiro/cl-repl/blob/master/LICENSE)
+[![License](http://img.shields.io/badge/license-GPLv3-blue.svg?style=flat)](https://github.com/koji-kojiro/cl-repl/blob/master/LICENSE)
 [![GitHub tag](https://img.shields.io/github/tag/koji-kojiro/cl-repl.svg?style=flat)](https://github.com/koji-kojiro/cl-repl/releases)
-[![Quicklisp dist](http://quickdocs.org/badge/cl-repl.svg)](http://quickdocs.org/cl-repl/)  
-:jp: [For Japanese](README_jp.md)
+[![Quicklisp dist](http://quickdocs.org/badge/cl-repl.svg)](http://quickdocs.org/cl-repl/)
 
-
-<br>
-<p align="center">
-  <img src="https://github.com/koji-kojiro/cl-repl/blob/master/image/cl-repl.gif">
-</p>
-
+# **Warning; WIP**
+The software is still alpha quality.  
+The functionalities are incomplete and may cause unkown bugs.
 
 # Overview
+This project aims to provide a beginner-friendly REPL for Common Lisp with rich functionalities, such as IPython for Python.
 
-CL-REPL is a full-featured repl implementation designed to work with **[Roswell](https://github.com/roswell/roswell/)**, which is strongly inspired by **[SLIME](https://github.com/slime/slime)** and **[IPython](https://github.com/ipython/ipython)**.
+What this project tries to achieve are listed here.
 
-## Features
+- [x] powerful line editting with gnu readline.
+- [x] tab-completion of symbols.
+- [x] simple installation instruction.
+- [x] code editting with text editor.
+- [ ] useful debugger & inspector. (incomplete)
+- [ ] syntax highlighting of input texts. (not available)
+- [ ] implementation independence. (only SBCL supported)
 
-- Emacs-like key bindings.<br>
-- Tab-completion.
-- Shell commands and magic commands.
+# Installation
+We recommend to use roswell.  
+CL-REPL can be installed via roswell as follows.
 
-Of course, the other general features are available! (e.g. debugger)
+```
+$ ros install koji-kojiro/cl-repl
+```
 
-# Requirements
-- [Roswell](https://github.com/roswell/roswell/)
-- Steel Bank Common Lisp (bundled to Roswell)
-- GNU Readline
-
-If you are using Homebrew on MacOSX, you may need to link the library yourself as follows.
+Before installation, please ensure that gnu readline is installed.  
+If you use OSX, you might need to execute following command.
 
 ```
 $ brew link --force readline
 ```
 
-***[Note]:Since v.0.3.0, CCL and ACL are no longer supported. This means that CL-REPL always uses `sbcl-bin` even if you switch implementation using` ros use`.***  
-***[Note]:Terminal should support ANSI escapes.***
-
-# Installation
-
-Via Roswell.<br>
-`$ ros install koji-kojiro/cl-repl`
+Also, ensure that your terminal support 256 colors.
 
 # Usage
-`$ cl-repl`
-
-or,
-
-`$ ros repl`
-
 ```
-$ cl-repl --help
-A full-featured Common Lisp REPL implementation.
-
-Usage:
-  cl-repl [OPTIONS]
-
-Options:
-  --help        Show this screen and exit.
-  --version     Show the version info and exit.
-  --load <file> Load <file> when startup.
-
+$　cl-repl
 ```
 
-## debugger
-When a condition is caught by REPL, the debugger starts up. You can select a restart type from three kinds of candidates. Please enter the number corresponding to the desired restart type and hit enter key. You can also execute any codes before restarting.
-
-### Restart type
-- [0]. Try evaluating again.
-    The debugger will try to evaluating the code again.
-- [1]. Return to top level.
-    The debugger will be aborted without re-evaluating the code.
-- [2]. Edit code.
-    The text editor specified by the environment variable `EDITOR` will start.
-    You can rewrite code with the editor.
-
-## Shell commands (`![commands]...`)
-
-If the line starts with "!", excute it as shell commnads.
+or
 
 ```
-CL-USER> !ls
-a.txt
-CL-USER> !ls -a
-.
-..
-.hidden-file
-a.txt
-CL-USER>
+$ ros repl
 ```
 
-## Magic commands
+Some useful magic commands are ready to use. To list available commands:
 
-Some useful magic commands are available. All magic commands have name prefixed `%`.
+```
+CL-USER> %help
+```
 
-### `%edit <file>`
-Start editing the code with the text editor specified by the environment variable `EDITOR`. When `<file>` is not given, a temporary file will be created.
+## execute shell
+If the line starts with `!`, excute it as shell command, e.g. `!ls -a`.
 
-We tested the following text editors.
+## %edit magic
+Line editting in repl is sometimes painful. CL-REPL allows yot to edit code with your favorite text editor. 
 
-| Editor | Result |
-|:----------:|:-----------:|
-| GNU Emacs | OK! |
-| GNU Emacs (emacs -nw) | OK! (recommended)|
-| [lem](https://github.com/cxxxr/lem) | OK!  (recommended)|
-| vim | OK! |
-| Joe's own editor | OK! |
-| GNU nano | OK! |
-| Atom | NG... |
-| Sublime Text3 | NG... |
+```
+CL-REPL> %edit <filename>
+```
 
-We recommend to add the line `export EDITOR="emacs -nw -q"` to your `.bashrc`. We recommend [lem](https://github.com/cxxxr/lem) also, because it's very lightweight and highly optimized for Common Lisp.
+CL-REPL invokes a text editor specified by `$EDITOR`.  
+After editting code, save and close it. Then repl will start to evaluate it.  
+If `<filename>` is not supplied, a temporary file will be created and deleted after evaluation.  
 
-***NOTE: The environment variable `EDITOR` is quite widely used (e.g. crontab -e, git commit...). So be careful with configuration.***
+We've be sure the following editors work properly.  
 
-### `%load <systems>...`
-
-Alias of `(ql:quickload systems... :silent t)`
-
-### `%save [file]`
-
-Save input history into `[file]`.
-
-### `%time [expression]`
-
-Measure execusion time of `[expression]`.
-
-## Introspection (`?[symbol's name]`)
-
-IPython style introspection is available.
-
-# License
-
-CL-REPL is distributed under [MIT license](LICENSE).
+- vi & vim
+- GNU Emacs
+- joe's own editor
+- Lem
 
 # Contributing
-Don't hesitate to open issues or to send pull requests!  
-The authors are unfamiliar to Common Lisp, as well as English...
+Don't hesitate to open issues or to send PRs.  
+Any suggestions are always welcomed.
 
 # Author
-
 [TANI Kojiro](https://github.com/koji-kojiro) (kojiro0531@gmail.com)
+
+# License
+CL-REPL is distributed under GPLv3.
+
+
+
+
+

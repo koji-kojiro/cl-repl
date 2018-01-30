@@ -11,41 +11,9 @@ exec ros -Q -m cl-repl -L sbcl-bin -- $0 "$@"
 (defpackage :ros.script.ros-repl.3724301531
   (:use :cl))
 (in-package :ros.script.ros-repl.3724301531)
-(ros:include "util")
-
-(defconstant +usage+
-  "Usage: ros [OPTIONS] repl [OPTIONS]
-
-Options:
-  --help        Show this screen and exit.
-  --version     Show the version info and exit.
-  --load <file> Load <file> when startup.
-
-")
-
-(defconstant +short-usage+ "try `ros repl --help`")
-
-(defconstant +versions-string+
-  (concatenate 'string
-	       (format nil "CL-REPL ~a - Common Lisp REPL for Roswell~%" cl-repl:+version+)
-	       (let ((impl (roswell.util:config "default.lisp")))
-		 (format nil "On Roswell ~a, ~a ~a~%"
-			 (ros::version)
-			 impl
-			 (roswell.util:config (format nil "~a.version" impl))))
-	       (format nil "~%(C) 2017 TANI Kojiro <kojiro0531@gmail.com>~%")))
 
 (defun main (&rest argv)
   (declare (ignorable argv))
-  (if (first argv)
-      (alexandria:switch ((first argv) :test #'equal)
-                         ("--help" (format t +usage+))
-                         ("--version" (format t "~a~%" cl-repl:+version+))
-			 ("--load" (cl-repl:repl :load (first (last argv))))
-                         (t (format t "~a~%" +short-usage+)))
-      (progn
-    	(format t "~a~%" +versions-string+)
-    	(finish-output)
-    	(cl-repl:repl))))
+  (cl-repl:main argv :show-logo nil))
 
 ;;; vim: set ft=lisp lisp:
