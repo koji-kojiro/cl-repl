@@ -1,8 +1,3 @@
-(in-package :cl-user)
-(defpackage cl-repl
-  (:use #:cl #:asdf))
-(in-package :cl-repl)
-
 (defsystem cl-repl
   :version "0.3.3"
   :author "TANI Kojiro"
