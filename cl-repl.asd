@@ -19,5 +19,8 @@
                                            (:file "input")
                                            (:file "repl")
                                            (:file "main"))))
+  :build-operation "program-op"
+  :build-pathname "cl-repl"
+  :entry-point "cl-repl:main"
   :description "A full-featured repl implementation."
   :long-description "A full-featured repl implementation.")
