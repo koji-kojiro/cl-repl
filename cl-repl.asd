@@ -1,4 +1,4 @@
-(defsystem cl-repl
+(asdf:defsystem cl-repl
   :version "0.4.0"
   :author "TANI Kojiro"
   :license "MIT"
