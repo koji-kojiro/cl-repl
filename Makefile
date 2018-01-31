@@ -1,13 +1,13 @@
 LISP     ?= sbcl
 SRC      := ./src/*.lisp
-PROG     := ./cl-repl
+PROG     := cl-repl
 
 .PHONY: build clean indent
 
 build: $(PROG)
 
 clean:
-	@$(if $(shell find -name $(PROG)), rm -f $(PROG) && echo removed \'$(PROG)\'
+	@$(if $(shell find -name $(PROG)), rm -f $(PROG) && echo removed \'$(PROG)\')	
 
 # format code with `ros fmt`
 indent: $(SRC)
