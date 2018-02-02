@@ -13,8 +13,11 @@
       (t (exit-with-prompt))))
   (throw *debugger-level* nil))
 
+(defvar *output-indicator-function*
+  #'(lambda () "[OUT]: "))
+
 (defun print-result (values)
-  (format t "~&~a~{ ~s~}~%" (color *output-indicator-color* "[OUT]:") values)
+  (format t "~&~a~{~s ~}~%" (color *output-indicator-color* (funcall *output-indicator-function*)) values)
   (finish-output) t) 
 
 (defun eval-print (-)
