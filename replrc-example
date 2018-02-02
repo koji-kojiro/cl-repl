@@ -1,0 +1,23 @@
+(in-package :repl-user)
+
+;; Change prompt like sbcl's repl
+(setf *default-prompt-function*
+  #'(lambda () "* "))
+(setf *debugger-prompt-function*
+  #'(lambda () (format nil "~d] " (1- *debugger-level*))))
+(setf *output-indicator-function*
+  #'(lambda () ""))
+
+;; Set color-scheme to "off"
+;; You can choose from "default" and "off", or create your own.
+(color-scheme "off")
+
+;; You can define your own magic commands
+;; If you want to put some message on the screen, use `cl-repl:message-from-magic` instead of `cl:format`.
+;; This function always returns `"nil"` (not `nil`).
+(define-magic pwd (&rest args)
+  (declare (ignore args))
+  ; put usage in one line. this documentation can be refer by %help magic.
+  "Show current working directory."
+  ; return value should be readable by cl:read-from-string
+  (format nil "~s" *default-pathname-defaults*))
