@@ -23,7 +23,7 @@
          (prompt-string (funcall prompt-function)))
     (if multiline-p
         (setf prompt-string
-              (format nil "~V@{.~}" (1- (length prompt-string)) :dummy)))
+              (format nil "~V@{.~} " (1- (length prompt-string)) :dummy)))
     (color color prompt-string)))
 
 (defun line-continue-p (string)
