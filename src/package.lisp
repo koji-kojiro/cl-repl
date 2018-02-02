@@ -7,7 +7,9 @@
            define-color-scheme
            color-scheme
            *default-prompt-function*
-           *debugger-prompt-function*))
+           *debugger-prompt-function*
+           *output-indicator-function*
+           *debugger-level*))
 
 (defpackage :repl-user
   (:use :cl :cl-repl))
