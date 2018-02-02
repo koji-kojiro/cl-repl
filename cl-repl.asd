@@ -7,10 +7,12 @@
                #:unix-opts
                #:split-sequence
                #:trivial-backtrace
-               #:cl-readline)
+               #:cl-readline
+               #:cl-annot)
   :serial t
   :components ((:module "src" :components ((:file "package")
                                            (:file "color")
+                                           (:file "color-scheme")
                                            (:file "keymap")
                                            (:file "command")
                                            (:file "shell")
