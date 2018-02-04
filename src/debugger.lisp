@@ -19,6 +19,7 @@
 (defun debugger (condition hook)
   (setf *current-condition* condition)
   (setf *invokable-restarts* (compute-restarts condition))
+  (setf *selected-restarts* nil)
   (debugger-banner)
   (let ((*debugger-hook* hook))
     (repl :level (1+ *debugger-level*) :keymap "debugger")
