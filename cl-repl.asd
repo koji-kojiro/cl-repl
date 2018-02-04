@@ -1,5 +1,5 @@
 (defsystem cl-repl
-  :version "0.4.10"
+  :version "0.4.1"
   :author "TANI Kojiro"
   :license "GPLv3"
   :depends-on (#:alexandria
@@ -7,6 +7,7 @@
                #:unix-opts
                #:split-sequence
                #:trivial-backtrace
+               #:cl-ppcre
                #:cl-readline)
   :serial t
   :components ((:module "src" :components ((:file "package")
