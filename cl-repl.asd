@@ -1,14 +1,13 @@
 (defsystem cl-repl
-  :version "0.4.0"
+  :version "0.4.10"
   :author "TANI Kojiro"
-  :license "MIT"
+  :license "GPLv3"
   :depends-on (#:alexandria
                #:uiop
                #:unix-opts
                #:split-sequence
                #:trivial-backtrace
-               #:cl-readline
-               #:cl-annot)
+               #:cl-readline)
   :serial t
   :components ((:module "src" :components ((:file "package")
                                            (:file "color")
