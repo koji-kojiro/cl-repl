@@ -1,5 +1,12 @@
 (in-package :cl-repl)
 
+(eval-when (:compile-toplevel)
+  (defvar *cl-functions-list*
+    (loop :for sym :being :the :external-symbols :of :cl
+          :when (handler-case (symbol-function sym) (error () nil))
+                :collect (ppcre:regex-replace-all "\\+"
+                           (ppcre:regex-replace-all "\\*" (string-downcase sym) "\\\\*") "\\\\+"))))
+
 (defvar *syntax-table*
   (list
    :string (list *string-syntax-color* "\".*?\"")
@@ -7,8 +14,8 @@
    :constant (list *constant-syntax-color* "([\\+])\\S+\\1")
    :keyword (list *keyword-syntax-color* "((?<=\\s)|^):\\S+(?=\\b)")
    :special (list *special-syntax-color* "(?<=\\b)(let|let\\*|lambda)(?=\\b)")
-   ;; not implemented
-   :function (list  *function-syntax-color* ".")))
+   :function (list  *function-syntax-color*
+                    (format nil "(?<=\\b)(~{~a|~})(?=\\b)" *cl-functions-list*))))
 
 (defun map-syntax (syntax text &optional syntax-map)
   (unless syntax-map
