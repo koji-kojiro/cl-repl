@@ -13,6 +13,7 @@
   :components ((:module "src" :components ((:file "package")
                                            (:file "color")
                                            (:file "color-scheme")
+                                           (:file "highlight")
                                            (:file "keymap")
                                            (:file "command")
                                            (:file "shell")
