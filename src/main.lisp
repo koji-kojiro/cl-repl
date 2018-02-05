@@ -76,6 +76,7 @@
   (format t "~a~%~a~2%" *versions* *copy*)
   #+sbcl (sb-ext:enable-debugger)
   (rl:register-function :complete #'completer)
+  (enable-syntax-highlight)
   (in-package :cl-user)
   (repl)
   (rl:deprep-terminal))
