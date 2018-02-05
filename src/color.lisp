@@ -13,3 +13,10 @@
 (defparameter *condition-color* 9)
 (defparameter *section-color* 21)
 (defparameter *message-color* 248)
+
+(defparameter *string-syntax-color* 40)
+(defparameter *variable-syntax-color* 13)
+(defparameter *constant-syntax-color* 13)
+(defparameter *keyword-syntax-color* 21)
+(defparameter *special-syntax-color* 14)
+(defparameter *function-syntax-color* 9)
