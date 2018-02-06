@@ -65,8 +65,8 @@
     (format t "~c[1C" #\esc))
   (finish-output))
 
-(defun enable-syntax-highlight ()
+(defun enable-syntax ()
   (rl:register-function :redisplay #'redisplay-with-highlight))
 
-(defun disable-syntax-highlight ()
-  (rl:register-function :redisplay #'redisplay))
+(defun disable-syntax ()
+  (rl:register-function :redisplay #'rl:redisplay))
