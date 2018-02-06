@@ -1,20 +1,38 @@
 (in-package :cl-repl)
 
-(defvar *cl-functions-list*
+(defun escape-name (name)
+  (ppcre:regex-replace-all
+    "\\+"
+    (ppcre:regex-replace-all
+      "\\*"
+      name "\\\\*")
+    "\\\\+"))
+
+(defun list-regex (lst)
+;   (format nil "(?<=\\b)(~{~a|~})(?=\\b)" lst))
+  (format nil "((?<=\\s)|^|(?<=\\()|(?<=\\)))(~{~a|~})(?=\\b)" lst))
+
+(destructuring-bind (functions specials)
   (loop :for sym :being :the :external-symbols :of :cl
         :when (handler-case (symbol-function sym) (error () nil))
-        :collect (ppcre:regex-replace-all "\\+"
-                                          (ppcre:regex-replace-all "\\*" (string-downcase sym) "\\\\*") "\\\\+")))
-
-(defvar *syntax-table*
-  (list
-   :string (list *string-syntax-color* "\".*?\"")
-   :variable (list *variable-syntax-color* "([\\*])\\S+\\1")
-   :constant (list *constant-syntax-color* "([\\+])\\S+\\1")
-   :keyword (list *keyword-syntax-color* "((?<=\\s)|^):\\S+(?=\\b)")
-   :special (list *special-syntax-color* "(?<=\\b)(let|let\\*|lambda)(?=\\b)")
-   :function (list  *function-syntax-color*
-                    (format nil "(?<=\\b)(~{~a|~})(?=\\b)" *cl-functions-list*))))
+              :collect (escape-name (string-downcase sym)) :into functions
+        :when (special-operator-p sym)
+              :collect (escape-name (string-downcase sym)) :into specials
+        :finally (return (list functions specials)))
+  (defvar *syntax-table*
+    (list
+     :string (list *string-syntax-color* "\".*?\"")
+     :variable (list *variable-syntax-color* "([\\*])\\S+\\1")
+     :constant (list *constant-syntax-color* "([\\+])\\S+\\1")
+     :keyword (list *keyword-syntax-color* "((?<=\\s)|^):\\S+(?=\\b)")
+     :definition (list *definition-syntax-color*
+                       "((?<=defun)|(?<=defmacro)|(?<=defmethod)|(?<=defgeneric))\\s\\S+(?=\\b)")
+     :lambda (list *lambda-syntax-color*
+                   (list-regex '("&allow-other-keys" "&aux" "&body" "&environment" "&key" "&optional" "&rest" "&whole")))
+     :special (list *special-syntax-color* (list-regex specials))
+     :function (list  *function-syntax-color* (list-regex functions))
+     :boolean (list *boolean-syntax-color* (list-regex '("nil" "t")))
+     :normal (list *normal-syntax-color* "."))))
 
 (defun map-syntax (syntax text &optional syntax-map)
   (unless syntax-map
