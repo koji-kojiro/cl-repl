@@ -70,6 +70,7 @@
       (uiop:quit 0))
     (when-option (options :no-init)
       (setf *site-init-path* nil)))
+  (enable-syntax)
   (site-init)
   (when show-logo
     (format t (color *logo-color* *logo*)))
