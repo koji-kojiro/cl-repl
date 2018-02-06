@@ -27,10 +27,9 @@
     (color color prompt-string)))
 
 (defun line-continue-p (string)
-  (let ((retval))
-    (handler-case (read-from-string string)
-      (error () (setf retval t)))
-    retval))
+  (let ((*read-eval* nil))
+    (handler-case (progn (read-from-string string) nil)
+      (end-of-file () t))))
 
 (defun check-input (input)
   (when (input-magic-p input)
@@ -65,7 +64,7 @@
         (let ((input (read-input1 :multiline-p t)))
           (when (null input)
             (terpri)
-            (return-from read-input nil))
+            (return-from read-input "nil"))
           (setf *last-input* (format nil "~a~%~a" *last-input* input)))
-        (return-from read-input (read-from-string *last-input*)))))
+        (return-from read-input *last-input*))))
 
