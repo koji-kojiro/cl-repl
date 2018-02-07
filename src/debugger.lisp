@@ -1,8 +1,14 @@
 (in-package :cl-repl)
 
+(defun condition-string (condition)
+  (ppcre:regex-replace-all "(?<=\\.) "
+    (ppcre:regex-replace-all "\\s\\s+"
+      (format nil "~a" condition) " ")
+    (string #\newline)))
+
 (defun debugger-banner ()
-  (format t (color *condition-color* "~a~%  [Condition of type ~a]~2%")
-          *current-condition* (type-of *current-condition*))
+  (format t (color *condition-color* "~a~% [Condition of type ~a]~2%")
+          (condition-string *current-condition*) (type-of *current-condition*))
   (format t (color *section-color* "Restarts:~%"))
   (loop :with choices = *invokable-restarts*
         :for choice :in choices
@@ -19,6 +25,7 @@
 (defun debugger (condition hook)
   (setf *current-condition* condition)
   (setf *invokable-restarts* (compute-restarts condition))
+  (setf *selected-restarts* nil)
   (debugger-banner)
   (let ((*debugger-hook* hook))
     (repl :level (1+ *debugger-level*) :keymap "debugger")

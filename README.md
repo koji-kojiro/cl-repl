@@ -18,8 +18,10 @@ What this project tries to achieve are listed here.
 - [x] simple installation instruction.
 - [x] code editting with text editor.
 - [ ] useful debugger & inspector. (incomplete)
-- [ ] syntax highlighting of input texts. (not available)
+- [x] syntax highlighting of input texts.
 - [ ] implementation independence. (only SBCL supported)
+
+Screenshots can be found [here](./image/).
 
 # Installation
 We recommend to use roswell.  
@@ -55,6 +57,18 @@ Some useful magic commands are ready to use. To list available commands:
 CL-USER> %help
 ```
 
+## Configuration
+You can customize CL-REPL by editting `~/.replrc`. You can change appearance, add your own commands, and do anything you want when startup.  
+An example can be found [here](./replrc-example).
+
+## Syntax highlighting
+Syntax highlighiting of input area is new in v0.5.0.
+If you want to disable it, put the following in your `.replrc`.
+
+```
+(disable-syntax)
+```
+
 ## execute shell
 If the line starts with `!`, excute it as shell command, e.g. `!ls -a`.
 
@@ -84,7 +98,7 @@ Any suggestions are always welcomed.
 [TANI Kojiro](https://github.com/koji-kojiro) (kojiro0531@gmail.com)
 
 # License
-CL-REPL is distributed under GPLv3.
+CL-REPL is distributed under [GPLv3](./LICENSE).
 
 
 

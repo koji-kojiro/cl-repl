@@ -30,8 +30,10 @@
   "Execute file in current enviroment."
   (declare (ignore args))
   (if (probe-file filename)
-      (format nil "(progn ~a )"
-              (alexandria:read-file-into-string filename))
+      (let ((code (format nil "(progn ~a )" (alexandria:read-file-into-string filename))))
+        (if (line-continue-p code)
+            (message-from-magic "Error: Unexpected EOF.")
+            code))
       (message-from-magic "Error: File not found.")))
 
 (defun edit-file-and-read (editor filename)

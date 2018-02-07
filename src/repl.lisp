@@ -13,26 +13,28 @@
       (t (exit-with-prompt))))
   (throw *debugger-level* nil))
 
+(defvar *output-indicator-function*
+  #'(lambda () "[OUT]: "))
+
 (defun print-result (values)
-  (format t "~&~a~{ ~s~}~%" (color *output-indicator-color* "[OUT]:") values)
+  (format t "~&~a~{~s ~}~%" (color *output-indicator-color* (funcall *output-indicator-function*)) values)
   (finish-output) t) 
 
 (defun eval-print (-)
-  (let ((*debugger-hook* #'debugger))
-    (setq values
-          (multiple-value-list
-           (eval -)))
-    (setq +++ ++ /// // *** (car ///)
-          ++ + // / ** (car //)
-          + - / values * (car /))
-    (print-result values)))
+  (setq values
+        (multiple-value-list
+          (eval -)))
+  (setq +++ ++ /// // *** (car ///)
+        ++ + // / ** (car //)
+        + - / values * (car /))
+  (print-result values))
 
 (defun read-eval-print ()
-  (restart-case
-      (eval-print (setq - (read-input)))
-    (*abort () :report "Deduce debugger level." t)
-    (*exit () :report "Exit CL-REPL." (throw 0 nil))
-    (*retry () :report "Try evaluating again." (eval-print -))))
+  (let ((*debugger-hook* #'debugger))
+    (restart-case (eval-print (setq - (read-from-string (read-input))))
+      (*abort () :report "Deduce debugger level." t)
+      (*exit () :report "Exit CL-REPL." (throw 0 nil))
+      (*retry () :report "Try evaluating again." (eval-print -)))))
 
 (defun repl (&key package (level 0) (keymap "default"))
   (loop :with *debugger-level* := level

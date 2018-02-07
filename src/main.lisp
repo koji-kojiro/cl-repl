@@ -25,6 +25,16 @@
           (lisp-implementation-type)
           (lisp-implementation-version)))
 
+(defvar *site-init-path* #P"~/.replrc")
+(defun site-init ()
+  (unless (probe-file *site-init-path*)
+    (return-from site-init))
+  (handler-case (load *site-init-path*)
+    (error (c)
+      (progn
+        (format *error-output* "Failed to load ~a, quitting.~%[~a]~%" *site-init-path* c)
+        (uiop:quit 1)))))
+
 (defmacro when-option ((options opt) &body body)
   `(let ((it (getf ,options ,opt)))
      (when it
@@ -38,7 +48,11 @@
   (:name :version
    :description "Show the version info and exit."
    :short #\v
-   :long "version"))
+   :long "version")
+  (:name :no-init
+   :description "Skip to load init file."
+   :short #\n
+   :long "no-init"))
 
 (defun main (&optional argv &key (show-logo t))
   (multiple-value-bind (options free-args)
@@ -53,7 +67,11 @@
       (uiop:quit 0))
     (when-option (options :version)
       (format t "cl-repl v~a~&" +version+)
-      (uiop:quit 0)))
+      (uiop:quit 0))
+    (when-option (options :no-init)
+      (setf *site-init-path* nil)))
+  (enable-syntax)
+  (site-init)
   (when show-logo
     (format t (color *logo-color* *logo*)))
   (format t "~a~%~a~2%" *versions* *copy*)
