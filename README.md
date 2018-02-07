@@ -21,6 +21,8 @@ What this project tries to achieve are listed here.
 - [x] syntax highlighting of input texts.
 - [ ] implementation independence. (only SBCL supported)
 
+Screenshots can be found [here](./images/).
+
 # Installation
 We recommend to use roswell.  
 CL-REPL can be installed via roswell as follows.
