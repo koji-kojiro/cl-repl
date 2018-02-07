@@ -6,6 +6,7 @@
            message-from-magic
            define-color-scheme
            color-scheme
+           disable-syntax
            *default-prompt-function*
            *debugger-prompt-function*
            *output-indicator-function*
