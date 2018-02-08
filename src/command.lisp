@@ -90,6 +90,21 @@
   (handler-case (progn (setf *package* (find-package (read-from-string package))) "nil")
     (error () (message-from-magic "Failed to change package."))))
 
+(define-magic doc (target &rest args)
+  "Show description of given object."
+  (declare (ignore args))
+  (handler-case
+    (let ((s (make-array '(0)
+                         :element-type 'base-char
+                         :fill-pointer 0
+                         :adjustable t)))
+      (with-output-to-string (sb s)
+        (describe (read-from-string target) sb))
+      (invoke-pager s)
+      "nil")
+    (error () (message-from-magic "No description given on `~a.`" target))))
+
+
 (define-magic help (&rest args)
   "List available magic commands and usages."
   (declare (ignore args))
