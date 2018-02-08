@@ -20,7 +20,9 @@
 (defun invoke-magic (magic &rest args)
   (loop :for (name body) :in *magic-commands*
         :when (string= name magic)
-        :do (return-from invoke-magic  (apply body args)))
+        :do (return-from invoke-magic
+              (handler-case (apply body args)
+                (error (c) (message-from-magic "Error: ~a" c)))))
   (message-from-magic "Command not found.: ~a" magic))
 
 (defun input-magic-p (&optional input)
