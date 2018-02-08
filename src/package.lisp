@@ -7,6 +7,8 @@
            define-color-scheme
            color-scheme
            disable-syntax
+           *pager-command*
+           *pager-minimum-line-count*
            *default-prompt-function*
            *debugger-prompt-function*
            *output-indicator-function*

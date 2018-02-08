@@ -1,5 +1,5 @@
 (defsystem cl-repl
-  :version "0.5.0"
+  :version "0.5.1"
   :author "TANI Kojiro"
   :license "GPLv3"
   :depends-on (#:alexandria
@@ -15,6 +15,7 @@
                                            (:file "color-scheme")
                                            (:file "highlight")
                                            (:file "keymap")
+                                           (:file "pager")
                                            (:file "command")
                                            (:file "shell")
                                            (:file "completer")

@@ -2,9 +2,9 @@
 
 (defun condition-string (condition)
   (ppcre:regex-replace-all "(?<=\\.) "
-    (ppcre:regex-replace-all "\\s\\s+"
-      (format nil "~a" condition) " ")
-    (string #\newline)))
+                           (ppcre:regex-replace-all "\\s\\s+"
+                                                    (format nil "~a" condition) " ")
+                           (string #\newline)))
 
 (defun debugger-banner ()
   (format t (color *condition-color* "~a~% [Condition of type ~a]~2%")
@@ -20,16 +20,22 @@
 
 (defvar *current-condition*)
 (defvar *invokable-restarts*)
-(defvar *selected-restart* nil)
+(defvar *selected-restart*)
+(defvar *backtrace-strings* nil)
 
 (defun debugger (condition hook)
-  (setf *current-condition* condition)
-  (setf *invokable-restarts* (compute-restarts condition))
-  (setf *selected-restarts* nil)
-  (debugger-banner)
-  (let ((*debugger-hook* hook))
-    (repl :level (1+ *debugger-level*) :keymap "debugger")
-    (invoke-restart-interactively (or *selected-restart* '*abort))))
+  (let ((*current-condition* condition)
+        (*invokable-restarts* (compute-restarts condition)))
+    (setf *selected-restart* nil)
+    (push (trivial-backtrace:print-backtrace
+           condition
+           :output nil)
+          *backtrace-strings*)
+    (debugger-banner)
+    (let ((*debugger-hook* hook))
+      (repl :level (1+ *debugger-level*) :keymap "debugger")
+      (pop *backtrace-strings*)
+      (invoke-restart-interactively (or *selected-restart* '*abort)))))
 
 (defun invoke-restart-by-number (args key)
   (declare (ignore args key))
@@ -48,7 +54,7 @@
 (defun show-backtrace (args key)
   (declare (ignore args key))
   (terpri)
-  (trivial-backtrace:print-backtrace *current-condition*)
+  (invoke-pager (car *backtrace-strings*))
   (setf rl:*done* t))
 
 (define-keymap "debugger" ()
