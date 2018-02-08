@@ -104,6 +104,11 @@
       "nil")
     (error () (message-from-magic "No description given on `~a.`" target))))
 
+(define-magic cls (&rest args)
+  "Clear screen."
+  (declare (ignore args))
+  (uiop:run-program "clear" :output *standard-output*)
+  (read-input))
 
 (define-magic help (&rest args)
   "List available magic commands and usages."
