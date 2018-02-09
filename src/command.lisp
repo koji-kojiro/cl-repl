@@ -100,6 +100,39 @@
         (message-from-magic "Package changed.: From ~(`~a` into `~a`~)" p (current-package)))
     (error () (message-from-magic "Failed to change package."))))
 
+(flet ((probe-command (cmd)
+         (handler-case
+             (progn
+               (uiop:run-program
+                (format nil "command -v ~a" cmd))
+               t)
+           (error () nil)))
+       (execute-foreign (cmd args)
+         (write-to-string
+          (caddr
+           (multiple-value-list
+            (uiop:run-program
+             (format nil "~a \"~{~a ~}\"" cmd
+                     (mapcar #'(lambda (a)
+                                 (ppcre:regex-replace-all "\"" a "\\\""))
+                             args))
+             :output :interactive
+             :input :interactive
+             :error-output :interactive
+             :ignore-error-status t))))))
+  (when (probe-command "python")
+    (define-magic python (&rest args)
+      "Execute line with Python."
+      (execute-foreign "python -c" args)))
+  (when (probe-command "ruby")
+    (define-magic ruby (&rest args)
+      "Execute line with Ruby."
+      (execute-foreign "ruby -e" args)))
+  (when (probe-command "perl")
+    (define-magic perl (&rest args)
+      "Execute line with Perl."
+      (execute-foreign "perl -e" args))))
+
 (define-magic doc (target &rest args)
   "Show description of given object."
   (declare (ignore args))
@@ -126,4 +159,5 @@
   (loop :for (name body) :in *magic-commands*
         :do (format t "~16,,a~a~%" name (documentation body 'function)))
   "nil")
+
 
