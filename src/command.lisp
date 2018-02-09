@@ -81,29 +81,37 @@
 #+quicklisp
 (define-magic load (&rest systems)
   "Alias to (ql:quickload '(<system>...) :silent t)."
-  (loop :for system :in systems
-        :do (handler-case (ql:quickload (intern system) :silent t)
-              (error () (message-from-magic "Failed to load system.: ~a~&" system))))
-  "nil")
+  (loop :repeat (length systems)
+        :for system := (pop systems) :while system
+        :do (handler-case
+                (progn
+                  (ql:quickload (intern system :keyword) :silent t)
+                  (message-from-magic "Loaded.: `~a`" system))
+              (error (c) (message-from-magic "Failed to load system.: `~a`: ~a" system c)))
+        :when (car systems) :do (terpri)
+        :finally (return "nil")))
 
 (define-magic package (&optional (package "cl-user") &rest args)
   "Alias to (in-pacakge <package>)."
   (declare (ignore args))
-  (handler-case (progn (setf *package* (find-package (read-from-string package))) "nil")
+  (handler-case
+      (let ((p (current-package)))
+        (setf *package* (find-package (read-from-string package)))
+        (message-from-magic "Package changed.: From ~(`~a` into `~a`~)" p (current-package)))
     (error () (message-from-magic "Failed to change package."))))
 
 (define-magic doc (target &rest args)
   "Show description of given object."
   (declare (ignore args))
   (handler-case
-    (let ((s (make-array '(0)
-                         :element-type 'base-char
-                         :fill-pointer 0
-                         :adjustable t)))
-      (with-output-to-string (sb s)
-        (describe (read-from-string target) sb))
-      (invoke-pager s)
-      "nil")
+      (let ((s (make-array '(0)
+                           :element-type 'base-char
+                           :fill-pointer 0
+                           :adjustable t)))
+        (with-output-to-string (sb s)
+          (describe (read-from-string target) sb))
+        (invoke-pager s)
+        "nil")
     (error () (message-from-magic "No description given on `~a.`" target))))
 
 (define-magic cls (&rest args)
