@@ -21,6 +21,7 @@
         :finally (return (list functions specials)))
   (defvar *syntax-table*
     (list
+     :magic (list *magic-syntax-color* "^%.*")
      :string (list *string-syntax-color* "\".*?\"")
      :variable (list *variable-syntax-color* "([\\*])\\S+\\1")
      :constant (list *constant-syntax-color* "([\\+])\\S+\\1")

@@ -19,6 +19,7 @@
           :do (set-color spec color))))
 
 (define-color-scheme "default" ()
+  ("magic-syntax" 39)
   ("string-syntax" 184)
   ("variable-syntax" 118)
   ("constant-syntax" 118)
@@ -38,6 +39,7 @@
   ("logo" 9))
 
 (define-color-scheme "off" ()
+  ("magic-syntax" nil)
   ("string-syntax" nil)
   ("variable-syntax" nil)
   ("constant-syntax" nil)
