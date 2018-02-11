@@ -18,6 +18,45 @@
   (format t (color *section-color* "Usage:~%"))
   (format t "  Ctrl+r: select restart. Ctrl+t: show backtrace.~2%"))
 
+#+sbcl
+(sb-ext:without-package-locks
+  (defun break (&optional (format-control "Break") &rest format-arguments)
+    (with-simple-restart (*continue "Return from BREAK.")
+      (invoke-debugger
+       (make-condition 'simple-condition
+                       :format-control format-control
+                       :format-arguments format-arguments)))
+    nil))
+
+(defun cl-repl/compute-restarts (condition)
+  (let ((restarts (compute-restarts condition))
+        (flag-count 0))
+    (or
+     (flet ((supplied-by-cl-repl (r)
+              (ppcre:scan "CL-REPL" (format nil "~s" r))))
+       (loop :for restart :in restarts
+             :for count :from 0
+             :until (> flag-count 2)
+             :when (and (> count 0)
+                        (or (supplied-by-cl-repl (nth (1- count) restarts))
+                            (supplied-by-cl-repl restart)))
+             :do (incf flag-count)
+             :when (and (zerop count)
+                        (supplied-by-cl-repl restart))
+             :do (incf flag-count)
+             :collect restart))
+     restarts)))
+
+(defun cl-repl/invoke-restart-interactively (restart)
+  (unless restart
+    (ignore-errors
+     (return-from cl-repl/invoke-restart-interactively (invoke-restart '*abort))))
+  (flet ((get-new-value () (read-from-string (rl:readline :prompt "value: "))))
+    (alexandria:switch ((string-downcase (restart-name restart)) :test #'string=)
+      ("store-value" (invoke-restart restart (get-new-value)))
+      ("use-value" (invoke-restart restart (get-new-value)))
+      (otherwise (invoke-restart-interactively restart)))))
+
 (defvar *current-condition*)
 (defvar *invokable-restarts*)
 (defvar *selected-restart*)
@@ -25,7 +64,7 @@
 
 (defun debugger (condition hook)
   (let ((*current-condition* condition)
-        (*invokable-restarts* (compute-restarts condition)))
+        (*invokable-restarts* (cl-repl/compute-restarts condition)))
     (setf *selected-restart* nil)
     (push (trivial-backtrace:print-backtrace
            condition
@@ -35,16 +74,16 @@
     (let ((*debugger-hook* hook))
       (repl :level (1+ *debugger-level*) :keymap "debugger")
       (pop *backtrace-strings*)
-      (invoke-restart-interactively (or *selected-restart* '*abort)))))
+      (cl-repl/invoke-restart-interactively *selected-restart*))))
 
-(defun invoke-restart-by-number (args key)
+(defun select-restart-by-number (args key)
   (declare (ignore args key))
   (format t "~%Restart number: ")
   (finish-output)
   (let ((rl:*done* t))
     (setf n (digit-char-p (rl:read-key))))  
-  (if (null n)
-      (format t "~%Please input number.~%")
+  (if (or (null n) (>= n (length *invokable-restarts*)))
+      (format t "~%Please input number below ~d.~%" (1- (length *invokable-restarts*)))
       (progn
         (terpri)
         (setf *selected-restart*
@@ -58,6 +97,6 @@
   (setf rl:*done* t))
 
 (define-keymap "debugger" ()
-  ("\\C-r" #'invoke-restart-by-number)
+  ("\\C-r" #'select-restart-by-number)
   ("\\C-t" #'show-backtrace))
 
