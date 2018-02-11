@@ -76,14 +76,14 @@
       (pop *backtrace-strings*)
       (cl-repl/invoke-restart-interactively *selected-restart*))))
 
-(defun invoke-restart-by-number (args key)
+(defun select-restart-by-number (args key)
   (declare (ignore args key))
   (format t "~%Restart number: ")
   (finish-output)
   (let ((rl:*done* t))
     (setf n (digit-char-p (rl:read-key))))  
-  (if (null n)
-      (format t "~%Please input number.~%")
+  (if (or (null n) (>= n (length *invokable-restarts*)))
+      (format t "~%Please input number below ~d.~%" (1- (length *invokable-restarts*)))
       (progn
         (terpri)
         (setf *selected-restart*
@@ -97,6 +97,6 @@
   (setf rl:*done* t))
 
 (define-keymap "debugger" ()
-  ("\\C-r" #'invoke-restart-by-number)
+  ("\\C-r" #'select-restart-by-number)
   ("\\C-t" #'show-backtrace))
 
