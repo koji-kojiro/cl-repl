@@ -29,12 +29,18 @@
         + - / values * (car /))
   (print-result values))
 
+(defmacro with-extra-restarts (form &rest restarts)
+  `(restart-case ,form
+     (*abort () :report "Deduce debugger level." t)
+     (*exit () :report "Exit CL-REPL." (throw 0 nil))
+     ,@restarts))
+
 (defun read-eval-print ()
   (let ((*debugger-hook* #'debugger))
-    (restart-case (eval-print (setq - (read-from-string (read-input))))
-      (*abort () :report "Deduce debugger level." t)
-      (*exit () :report "Exit CL-REPL." (throw 0 nil))
-      (*retry () :report "Try evaluating again." (eval-print -)))))
+    (with-extra-restarts
+      (eval-print (setq - (read-from-string (read-input))))
+      (*retry () :report "Try evaluating again."
+                 (with-extra-restarts (eval-print -))))))
 
 (defun repl (&key package (level 0) (keymap "default"))
   (loop :with *debugger-level* := level

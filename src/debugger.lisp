@@ -21,12 +21,31 @@
 #+sbcl
 (sb-ext:without-package-locks
   (defun break (&optional (format-control "Break") &rest format-arguments)
-    (with-simple-restart (continue "Return from BREAK.")
+    (with-simple-restart (*continue "Return from BREAK.")
       (invoke-debugger
         (make-condition 'simple-condition
                         :format-control format-control
                         :format-arguments format-arguments)))
     nil))
+
+(defun cl-repl/compute-restarts (condition)
+  (let ((restarts (compute-restarts condition))
+        (flag-count 0))
+    (or
+      (flet ((supplied-by-cl-repl (r)
+                (ppcre:scan "CL-REPL" (format nil "~s" r))))
+        (loop :for restart :in restarts
+              :for count :from 0
+              :until (> flag-count 2)
+              :when (and (> count 0)
+                        (or (supplied-by-cl-repl (nth (1- count) restarts))
+                            (supplied-by-cl-repl restart)))
+                    :do (incf flag-count)
+              :when (and (zerop count)
+                         (supplied-by-cl-repl restart))
+                    :do (incf flag-count)
+              :collect restart))
+      restarts)))
 
 (defvar *current-condition*)
 (defvar *invokable-restarts*)
@@ -35,7 +54,7 @@
 
 (defun debugger (condition hook)
   (let ((*current-condition* condition)
-        (*invokable-restarts* (compute-restarts condition)))
+        (*invokable-restarts* (cl-repl/compute-restarts condition)))
     (setf *selected-restart* nil)
     (push (trivial-backtrace:print-backtrace
            condition
