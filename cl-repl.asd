@@ -7,6 +7,7 @@
                #:unix-opts
                #:split-sequence
                #:trivial-backtrace
+               #:conium
                #:cl-ppcre
                #:cl-readline)
   :serial t

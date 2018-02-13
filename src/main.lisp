@@ -54,6 +54,13 @@
    :short #\n
    :long "no-init"))
 
+(progn
+  #+sbcl
+  (sb-ext:enable-debugger)
+  (conium:install-debugger-globally #'debugger)
+  (enable-syntax)
+  (rl:register-function :complete #'completer))
+
 (defun main (&optional argv &key (show-logo t))
   (multiple-value-bind (options free-args)
       (handler-case
@@ -70,14 +77,12 @@
       (uiop:quit 0))
     (when-option (options :no-init)
       (setf *site-init-path* nil)))
-  (enable-syntax)
   (site-init)
   (when show-logo
     (format t (color *logo-color* *logo*)))
   (format t "~a~%~a~2%" *versions* *copy*)
-  #+sbcl (sb-ext:enable-debugger)
-  (rl:register-function :complete #'completer)
   (in-package :cl-user)
-  (repl)
-  (rl:deprep-terminal))
+  (unwind-protect
+    (repl)
+    (rl:deprep-terminal)))
 

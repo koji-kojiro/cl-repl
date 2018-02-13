@@ -36,11 +36,10 @@
      ,@restarts))
 
 (defun read-eval-print ()
-  (let ((*debugger-hook* #'debugger))
-    (with-extra-restarts
-      (eval-print (setq - (read-from-string (read-input))))
-      (*retry () :report "Try evaluating again."
-                 (with-extra-restarts (eval-print -))))))
+  (with-extra-restarts
+    (eval-print (setq - (read-from-string (read-input))))
+    (*retry () :report "Try evaluating again."
+      (with-extra-restarts (eval-print -)))))
 
 (defun repl (&key package (level 0) (keymap "default"))
   (loop :with *debugger-level* := level
