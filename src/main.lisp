@@ -55,9 +55,6 @@
    :long "no-init"))
 
 (progn
-  #+sbcl
-  (sb-ext:enable-debugger)
-  (conium:install-debugger-globally #'debugger)
   (enable-syntax)
   (rl:register-function :complete #'completer))
 
@@ -83,6 +80,6 @@
   (format t "~a~%~a~2%" *versions* *copy*)
   (in-package :cl-user)
   (unwind-protect
-    (repl)
+    (conium:call-with-debugger-hook #'debugger #'repl)
     (rl:deprep-terminal)))
 

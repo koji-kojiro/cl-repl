@@ -24,16 +24,6 @@
   (format t (color *section-color* "Usage:~%"))
   (format t "  Ctrl+r: select restart. Ctrl+t: show backtrace.~2%"))
 
-#+sbcl
-(sb-ext:without-package-locks
-  (defun break (&optional (format-control "Break") &rest format-arguments)
-    (with-simple-restart (*continue "Return from BREAK.")
-      (invoke-debugger
-       (make-condition 'simple-condition
-                       :format-control format-control
-                       :format-arguments format-arguments)))
-    nil))
-
 (defun cl-repl/compute-restarts (condition)
   (let ((restarts (compute-restarts condition))
         (flag-count 0))
