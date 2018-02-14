@@ -70,16 +70,19 @@
 
 #+sbcl
 (defun push-backtrace-string ()
-  (push
-    (format nil "~{~a~%~}"
-      (loop :for f := sb-debug:*stack-top-hint* :then (sb-di:frame-down f)
-            :for n :from 0
-            :until (eql (sb-di:debug-fun-fun (sb-di:frame-debug-fun f)) #'cl-repl::eval-print)
-            :collect (let ((s (make-string-output-stream)))
-                       (format s "~2d: " n)
-                       (sb-debug::print-frame-call f s)
-                       (get-output-stream-string s))))
-    *backtrace-strings*))
+  (let ((stack-top-hint sb-debug:*stack-top-hint*))
+    (push
+      (if stack-top-hint
+        (format nil "~{~a~%~}"
+          (loop :for f := stack-top-hint :then (sb-di:frame-down f)
+                :for n :from 0
+                :until (or (null f) (eql (sb-di:debug-fun-fun (sb-di:frame-debug-fun f)) #'cl-repl::eval-print))
+                :collect (let ((s (make-string-output-stream)))
+                           (format s "~2d: " n)
+                           (sb-debug::print-frame-call f s)
+                           (get-output-stream-string s))))
+        "")
+      *backtrace-strings*)))
 
 (defun debugger (condition hook)
   (let ((*current-condition* condition)
