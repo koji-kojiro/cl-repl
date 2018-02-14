@@ -15,6 +15,11 @@
         :for n :to (length choices)
         :do (format t "~2d: [~a] ~a~%"  n (restart-name choice) choice))
   (terpri)
+  (format t (color *section-color* "Bactrace:~%"))
+  (loop :for frame :in (split-sequence:split-sequence #\newline (car *backtrace-strings*))
+        :for n :from 0 :to 5
+        :do (format t "~a~%" frame)
+        :finally (when (= n 5) (format t " --more-- ~%")))
   (format t (color *section-color* "Usage:~%"))
   (format t "  Ctrl+r: select restart. Ctrl+t: show backtrace.~2%"))
 
@@ -62,18 +67,28 @@
 (defvar *selected-restart*)
 (defvar *backtrace-strings* nil)
 
+#+sbcl
+(defun push-backtrace-string ()
+  (push
+    (format nil "~{~a~%~}"
+      (loop :for f := sb-debug:*stack-top-hint* :then (sb-di:frame-down f)
+            :for n :from 0
+            :until (eql (sb-di:debug-fun-fun (sb-di:frame-debug-fun f)) #'cl-repl::eval-print)
+            :collect (let ((s (make-string-output-stream)))
+                       (format s "~2d: " n)
+                       (sb-debug::print-frame-call f s)
+                       (get-output-stream-string s))))
+    *backtrace-strings*))
+
 (defun debugger (condition hook)
   (let ((*current-condition* condition)
         (*invokable-restarts* (cl-repl/compute-restarts condition)))
     (setf *selected-restart* nil)
-    (push (trivial-backtrace:print-backtrace
-           condition
-           :output nil)
-          *backtrace-strings*)
+    #+sbcl (push-backtrace-string)
     (debugger-banner)
     (let ((*debugger-hook* hook))
       (repl :level (1+ *debugger-level*) :keymap "debugger")
-      (pop *backtrace-strings*)
+      #+sbcl (pop *backtrace-strings*)
       (cl-repl/invoke-restart-interactively *selected-restart*))))
 
 (defun select-restart-by-number (args key)
