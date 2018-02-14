@@ -16,11 +16,15 @@
         :for n :to (length choices)
         :do (format t "~2d: [~a] ~a~%"  n (restart-name choice) choice))
   (terpri)
-  (format t (color *section-color* "Bactrace:~%"))
-  (loop :for frame :in (split-sequence:split-sequence #\newline (car *backtrace-strings*))
-        :for n :from 0 :to 5
+  (format t (color *section-color* "Backtrace:~%"))
+  (loop :for frame :in (split-sequence:split-sequence
+                         #\newline
+                         (car *backtrace-strings*)
+                         :remove-empty-subseqs t)
+        :for n :from 0 :below 2
         :do (format t "~a~%" frame)
-        :finally (when (= n 5) (format t " --more-- ~%")))
+        :finally (when (= n 2) (format t " --more--~%")))
+  (terpri)
   (format t (color *section-color* "Usage:~%"))
   (format t "  Ctrl+r: select restart. Ctrl+t: show backtrace.~2%"))
 
@@ -66,7 +70,7 @@
         (format nil "~{~a~%~}"
           (loop :for f := stack-top-hint :then (sb-di:frame-down f)
                 :for n :from 0
-                :until (or (null f) (eql (sb-di:debug-fun-fun (sb-di:frame-debug-fun f)) #'cl-repl::eval-print))
+                :while f
                 :collect (let ((s (make-string-output-stream)))
                            (format s "~2d: " n)
                            (sb-debug::print-frame-call f s)
