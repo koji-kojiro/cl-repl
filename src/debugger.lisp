@@ -1,10 +1,11 @@
 (in-package :cl-repl)
 
 (defun condition-string (condition)
-  (ppcre:regex-replace-all "(?<=\\.) "
-                           (ppcre:regex-replace-all "\\s\\s+"
-                                                    (format nil "~a" condition) " ")
-                           (string #\newline)))
+  #+sbcl
+  (let ((sb-int:*print-condition-references* nil))
+    (princ-to-string condition))
+  #-sbcl
+  (princ-to-string condition))
 
 (defun debugger-banner ()
   (format t (color *condition-color* "~a~% [Condition of type ~a]~2%")
