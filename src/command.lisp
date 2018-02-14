@@ -79,6 +79,13 @@
         (message-from-magic "Error: Unexpected EOF.")
         code)))
 
+(define-magic step (&rest forms)
+  "Alias to (step <form>)."
+  (let ((code (format nil "(step ~{ ~a~})" forms)))
+    (if (line-continue-p code)
+        (message-from-magic "Error: Unexpected EOF.")
+        code)))
+
 #+quicklisp
 (define-magic load (&rest systems)
   "Alias to (ql:quickload '(<system>...) :silent t)."
