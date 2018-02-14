@@ -26,7 +26,11 @@
         :finally (when (= n 2) (format t " --more--~%")))
   (terpri)
   (format t (color *section-color* "Usage:~%"))
-  (format t "  Ctrl+r: select restart. Ctrl+t: show backtrace.~2%"))
+  (format t "  Ctrl+r: select restart. Ctrl+t: show backtrace.~%")
+  #+sbcl
+  (when (subtypep (type-of *current-condition*) 'sb-ext:step-condition)
+    (format t "  Ctrl+o: step-out. Ctrl+x: step-next, Ctrl+o: step-into.~%"))
+  (terpri))
 
 (defun cl-repl/compute-restarts (condition)
   (let ((restarts (compute-restarts condition))
@@ -109,7 +113,34 @@
   (invoke-pager (car *backtrace-strings*))
   (setf rl:*done* t))
 
+(defmacro set-restart (restart-designator)
+  (let ((restart (gensym)))
+    `(progn
+       (setf ,restart (find-restart ,restart-designator))
+       (when ,restart
+         (setf rl:*done* t)
+         (setf *selected-restart* ,restart)
+         (throw *debugger-level* nil)))))
+
+(defun step-out (args key)
+  (declare (ignore args key))
+  #+scbl
+  (set-restart 'sb-ext:step-out))
+
+(defun step-next (args key)
+  (declare (ignore args key))
+  #+sbcl
+  (set-restart 'sb-ext:step-next))
+
+(defun step-into (args key)
+  (declare (ignore args key))
+  #+sbcl
+  (set-restart 'sb-ext:step-into))
+
 (define-keymap "debugger" ()
   ("\\C-r" #'select-restart-by-number)
+  ("\\C-o" #'step-out)
+  ("\\C-x" #'step-next)
+  ("\\C-s" #'step-into)
   ("\\C-t" #'show-backtrace))
 
