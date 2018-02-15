@@ -66,8 +66,12 @@
     (format t "~c[1C" #\esc))
   (finish-output))
 
+(defvar *syntax-enabled* nil)
+
 (defun enable-syntax ()
+  (setf *syntax-enabled* t)
   (rl:register-function :redisplay #'redisplay-with-highlight))
 
 (defun disable-syntax ()
+  (setf *syntax-enabled* nil)
   (rl:register-function :redisplay #'rl:redisplay))
