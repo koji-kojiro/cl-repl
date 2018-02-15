@@ -56,7 +56,8 @@
 
 (progn
   (enable-syntax)
-  (rl:register-function :complete #'completer))
+  (rl:register-function :complete #'completer)
+  (install-inspector))
 
 (defun main (&optional argv &key (show-logo t))
   (multiple-value-bind (options free-args)
