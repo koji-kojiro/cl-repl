@@ -159,6 +159,8 @@
   "Clear screen."
   (declare (ignore args))
   (uiop:run-program "clear" :output *standard-output*)
+  (when (> *debugger-level* 0)
+    (debugger-banner))
   (read-input))
 
 (define-magic help (&rest args)
