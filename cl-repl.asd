@@ -21,6 +21,7 @@
                                            (:file "shell")
                                            (:file "completer")
                                            (:file "debugger")
+                                           (:file "inspector")
                                            (:file "input")
                                            (:file "repl")
                                            (:file "main"))))
