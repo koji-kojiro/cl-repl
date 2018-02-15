@@ -93,7 +93,6 @@
                 :do (progn (debugger-banner) (setf *redisplay-debugger-banner* nil)))))
 
 (defun debugger (condition hook)
-  (declare (ignore hook))
   (let ((*current-condition* condition)
         (*invokable-restarts* (cl-repl/compute-restarts condition)))
     (setf *selected-restart* nil
@@ -101,7 +100,8 @@
     #+sbcl (push-backtrace-string)
     (debugger-banner)
     (set-keymap "debugger")
-    (debugger-loop (1+ *debugger-level*))
+    (let ((*debugger-hook* hook))
+      (debugger-loop (1+ *debugger-level*)))
     (setf *redisplay-debugger-banner* t)
     (when *debugger-flush-screen*
       (uiop:run-program "clear" :output *standard-output*))
