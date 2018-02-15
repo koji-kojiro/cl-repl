@@ -55,7 +55,11 @@
       (format t "~c[?25h" #\escape)))
   (when *inspector-flush-screen*
     (uiop:run-program "clear" :output *standard-output*)
-    (read-input)))
+    (if (zerop *debugger-level*)
+        (set-keymap "default")
+        (progn
+          (set-keymap "debugger")
+          (debugger-banner)))))
 
 (defun inspector-quit (args key)
   (declare (ignore args key))

@@ -43,6 +43,7 @@
         (with-extra-restarts (eval-print -))))))
 
 (defun repl ()
-  (loop :do (set-keymap "default")
+  (loop :when (string/= *keymap* "default")
+              :do (set-keymap "default")
         :while (catch 0 (read-eval-print))))
  
