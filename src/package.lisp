@@ -9,6 +9,7 @@
            disable-syntax
            *pager-command*
            *pager-minimum-line-count*
+           *pager-flush-screen*
            *default-prompt-function*
            *debugger-prompt-function*
            *output-indicator-function*
