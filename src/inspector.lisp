@@ -48,8 +48,11 @@
   (set-keymap "inspector")
   (setf *inspector-state* nil
         *inspector-redisplay-banner* nil)
+  (format t "~c[?25l" #\escape)
   (catch 'inspector-quit
-    (inspect-one object))
+    (unwind-protect
+      (inspect-one object)
+      (format t "~c[?25h" #\escape)))
   (when *inspector-flush-screen*
     (uiop:run-program "clear" :output *standard-output*)
     (read-input)))
