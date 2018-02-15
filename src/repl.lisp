@@ -35,13 +35,14 @@
      (*exit () :report "Exit CL-REPL." (throw 0 nil))
      ,@restarts))
 
-(defun read-eval-print ()
-  (with-extra-restarts
-    (eval-print (setq - (read-from-string (read-input))))
-    (*retry () :report "Try evaluating again."
-      (with-extra-restarts (eval-print -)))))
+(defun read-eval-print (&key (level 0))
+  (let ((*debugger-level* level))
+    (with-extra-restarts
+      (eval-print (setq - (read-from-string (read-input))))
+      (*retry () :report "Try evaluating again."
+        (with-extra-restarts (eval-print -))))))
 
-(defun repl (&key package (level 0) (keymap "default"))
-  (loop :with *debugger-level* := level
-        :do (set-keymap keymap)
-        :while (catch level (read-eval-print))))
+(defun repl ()
+  (loop :do (set-keymap "default")
+        :while (catch 0 (read-eval-print))))
+ 

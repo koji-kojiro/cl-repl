@@ -1,5 +1,12 @@
 (in-package :cl-repl)
 
+(defvar *current-condition*)
+(defvar *invokable-restarts*)
+(defvar *selected-restart*)
+(defvar *backtrace-strings* nil)
+(defvar *redisplay-debugger-banner*)
+(defparameter *debugger-flush-screen* t)
+
 (defun condition-string (condition)
   #+sbcl
   (let ((sb-int:*print-condition-references* nil))
@@ -8,6 +15,8 @@
   (princ-to-string condition))
 
 (defun debugger-banner ()
+  (when *debugger-flush-screen*
+    (uiop:run-program "clear" :output *standard-output*))
   (format t (color *condition-color* "~a~% [Condition of type ~a]~2%")
           (condition-string *current-condition*) (type-of *current-condition*))
   (format t (color *section-color* "Restarts:~%"))
@@ -61,11 +70,6 @@
       ("use-value" (invoke-restart restart (get-new-value)))
       (otherwise (invoke-restart-interactively restart)))))
 
-(defvar *current-condition*)
-(defvar *invokable-restarts*)
-(defvar *selected-restart*)
-(defvar *backtrace-strings* nil)
-
 #+sbcl
 (defun push-backtrace-string ()
   (let ((stack-top-hint sb-debug:*stack-top-hint*))
@@ -82,16 +86,27 @@
         "")
       *backtrace-strings*)))
 
+(defun debugger-loop (level)
+  (let ((*debugger-level* level))
+    (loop :while (catch level (read-eval-print :level level))
+          :when *redisplay-debugger-banner*
+                :do (progn (debugger-banner) (setf *redisplay-debugger-banner* nil)))))
+
 (defun debugger (condition hook)
+  (declare (ignore hook))
   (let ((*current-condition* condition)
         (*invokable-restarts* (cl-repl/compute-restarts condition)))
-    (setf *selected-restart* nil)
+    (setf *selected-restart* nil
+          *redisplay-debugger-banner* nil)
     #+sbcl (push-backtrace-string)
     (debugger-banner)
-    (let ((*debugger-hook* hook))
-      (repl :level (1+ *debugger-level*) :keymap "debugger")
-      #+sbcl (pop *backtrace-strings*)
-      (cl-repl/invoke-restart-interactively *selected-restart*))))
+    (set-keymap "debugger")
+    (debugger-loop (1+ *debugger-level*))
+    (setf *redisplay-debugger-banner* t)
+    (when *debugger-flush-screen*
+      (uiop:run-program "clear" :output *standard-output*))
+    #+sbcl (pop *backtrace-strings*)
+    (cl-repl/invoke-restart-interactively *selected-restart*)))
 
 (defun select-restart-by-number (args key)
   (declare (ignore args key))
