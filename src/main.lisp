@@ -79,9 +79,10 @@
       (setf *site-init-path* nil)))
   (site-init)
   (when *repl-flush-screen* (flush-screen))
-  (when show-logo
-    (format t (color *logo-color* *logo*)))
-  (format t "~a~%~a~2%" *versions* *copy*)
+  (with-cursor-hidden
+    (when show-logo
+      (format t (color *logo-color* *logo*)))
+    (format t "~a~%~a~2%" *versions* *copy*))
   (in-package :cl-user)
   (unwind-protect
     (conium:call-with-debugger-hook #'debugger #'repl)

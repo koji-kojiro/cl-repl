@@ -9,19 +9,20 @@
 
 (defun inspector-banner ()
   (when *inspector-flush-screen* (flush-screen))
-  #+sbcl
-  (destructuring-bind (description named-p elements)
-    (multiple-value-list (sb-impl::inspected-parts *inspected*))
-    (setf *inspect-named-p* named-p)
-    (setf *inspect-elements* elements)
-    (format t "~a~%" (color  *condition-color* description))
-    (format t (color *section-color* "Slots:~%"))
-    (loop :for elm :in elements
-          :for n :from 0
-          :do (format t "~2d. ~a~%" n elm)))
-  (terpri)
-  (format t (color *section-color* "Usage:~%"))
-  (format t "  q: quit. 0~~9: inspect the numbered slot.~2%"))
+  (with-cursor-hidden
+    #+sbcl
+    (destructuring-bind (description named-p elements)
+      (multiple-value-list (sb-impl::inspected-parts *inspected*))
+      (setf *inspect-named-p* named-p)
+      (setf *inspect-elements* elements)
+      (format t "~a~%" (color  *condition-color* description))
+      (format t (color *section-color* "Slots:~%"))
+      (loop :for elm :in elements
+            :for n :from 0
+            :do (format t "~2d. ~a~%" n elm)))
+    (terpri)
+    (format t (color *section-color* "Usage:~%"))
+    (format t "  q: quit. 0~~9: inspect the numbered slot.~2%")))
 
 (defun inspector-process-key ()
   (rl:register-function :redisplay #'(lambda () nil))

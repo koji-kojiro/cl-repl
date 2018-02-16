@@ -55,16 +55,16 @@
                   :collect (or colored raw)))))
 
 (defun redisplay-with-highlight ()
-  (format t "~c[2K~c~a~a~c[~aD"
-          #\esc
-          #\return
-          rl:*display-prompt*
-          (highlight-text rl:*line-buffer*)
-          #\esc
-          (- rl:+end+ rl:*point*))
-  (when (= rl:+end+ rl:*point*)
-    (format t "~c[1C" #\esc))
-  (finish-output))
+  (with-cursor-hidden
+    (format t "~c[2K~c~a~a~c[~aD"
+            #\esc
+            #\return
+            rl:*display-prompt*
+            (highlight-text rl:*line-buffer*)
+            #\esc
+            (- rl:+end+ rl:*point*))
+    (when (= rl:+end+ rl:*point*)
+      (format t "~c[1C" #\esc))))
 
 (defvar *syntax-enabled* nil)
 
