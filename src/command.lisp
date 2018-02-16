@@ -27,7 +27,7 @@
   (message-from-magic "Command not found.: ~a" magic))
 
 (defun input-magic-p (&optional input)
-  (alexandria:starts-with-subseq "%" input))
+  (string-starts-with input "%"))
 
 (define-magic run (filename &rest args)
   "Execute file in current enviroment."
