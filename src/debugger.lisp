@@ -26,10 +26,7 @@
         :do (format t "~2d: [~a] ~a~%"  n (restart-name choice) choice))
   (terpri)
   (format t (color *section-color* "Backtrace:~%"))
-  (loop :for frame :in (split-sequence:split-sequence
-                         #\newline
-                         (car *backtrace-strings*)
-                         :remove-empty-subseqs t)
+  (loop :for frame :in (split-lines (car *backtrace-strings*))
         :for n :from 0 :below 2
         :do (format t "~a~%" frame)
         :finally (when (= n 2) (format t " --more--~%")))

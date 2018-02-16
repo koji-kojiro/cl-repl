@@ -34,11 +34,7 @@
 (defun check-input (input)
   (when (input-magic-p input)
     (setf *last-input*
-          (apply #'invoke-magic
-                 (split-sequence:split-sequence
-                  #\SPACE
-                  input
-                  :remove-empty-subseqs t)))
+          (apply #'invoke-magic (split-space input)))
     (return-from check-input))
   (when (shell-command-p input)
     (setf *last-input* "nil")
