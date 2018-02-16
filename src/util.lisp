@@ -24,8 +24,11 @@
   `(unwind-protect
      (progn
        (format t "~c[?25l" #\esc)
+       (finish-output)
        ,@body)
-     (format t "~c[?25h" #\esc)))
+     (progn
+       (format t "~c[?25h" #\esc)
+       (finish-output))))
 
 (defun flush-screen ()
   (with-cursor-hidden
