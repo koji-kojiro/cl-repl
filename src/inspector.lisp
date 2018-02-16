@@ -8,8 +8,7 @@
 (defparameter *inspector-flush-screen* t)
 
 (defun inspector-banner ()
-  (when *inspector-flush-screen*
-    (uiop:run-program "clear" :output *standard-output*))
+  (when *inspector-flush-screen* (flush-screen))
   #+sbcl
   (destructuring-bind (description named-p elements)
     (multiple-value-list (sb-impl::inspected-parts *inspected*))
@@ -54,7 +53,7 @@
       (inspect-one object)
       (format t "~c[?25h" #\escape)))
   (when *inspector-flush-screen*
-    (uiop:run-program "clear" :output *standard-output*)
+    (flush-screen)
     (if (zerop *debugger-level*)
         (set-keymap "default")
         (progn

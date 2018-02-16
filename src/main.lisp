@@ -78,8 +78,7 @@
     (when-option (options :no-init)
       (setf *site-init-path* nil)))
   (site-init)
-  (when *repl-flush-screen*
-    (uiop:run-program "clear" :output *standard-output*))
+  (when *repl-flush-screen* (flush-screen))
   (when show-logo
     (format t (color *logo-color* *logo*)))
   (format t "~a~%~a~2%" *versions* *copy*)
@@ -87,7 +86,6 @@
   (unwind-protect
     (conium:call-with-debugger-hook #'debugger #'repl)
     (rl:deprep-terminal))
-  (when *repl-flush-screen*
-    (uiop:run-program "clear" :output *standard-output*)))
+  (when *repl-flush-screen* (flush-screen)))
 
 

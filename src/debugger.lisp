@@ -15,8 +15,7 @@
   (princ-to-string condition))
 
 (defun debugger-banner ()
-  (when *debugger-flush-screen*
-    (uiop:run-program "clear" :output *standard-output*))
+  (when *debugger-flush-screen* (flush-screen))
   (format t (color *condition-color* "~a~% [Condition of type ~a]~2%")
           (condition-string *current-condition*) (type-of *current-condition*))
   (format t (color *section-color* "Restarts:~%"))
@@ -100,8 +99,7 @@
     (let ((*debugger-hook* hook))
       (debugger-loop (1+ *debugger-level*)))
     (setf *redisplay-debugger-banner* t)
-    (when *debugger-flush-screen*
-      (uiop:run-program "clear" :output *standard-output*))
+    (when *debugger-flush-screen* (flush-screen))
     #+sbcl (pop *backtrace-strings*)
     (cl-repl/invoke-restart-interactively *selected-restart*)))
 
