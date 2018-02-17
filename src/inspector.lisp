@@ -5,24 +5,24 @@
 (defvar *inspect-named-p*)
 (defvar *inspector-state*)
 (defvar *inspector-redisplay-banner*)
-(defparameter *inspector-flush-screen* t)
+(defparameter *inspector-flush-screen* nil)
 
 (defun inspector-banner ()
-  (when *inspector-flush-screen*
-    (uiop:run-program "clear" :output *standard-output*))
-  #+sbcl
-  (destructuring-bind (description named-p elements)
-    (multiple-value-list (sb-impl::inspected-parts *inspected*))
-    (setf *inspect-named-p* named-p)
-    (setf *inspect-elements* elements)
-    (format t "~a~%" (color  *condition-color* description))
-    (format t (color *section-color* "Slots:~%"))
-    (loop :for elm :in elements
-          :for n :from 0
-          :do (format t "~2d. ~a~%" n elm)))
-  (terpri)
-  (format t (color *section-color* "Usage:~%"))
-  (format t "  q: quit. 0~~9: inspect the numbered slot.~2%"))
+  (when *inspector-flush-screen* (flush-screen))
+  (with-cursor-hidden
+    #+sbcl
+    (destructuring-bind (description named-p elements)
+      (multiple-value-list (sb-impl::inspected-parts *inspected*))
+      (setf *inspect-named-p* named-p)
+      (setf *inspect-elements* elements)
+      (format t "~a~%" (color  *condition-color* description))
+      (format t (color *section-color* "Slots:~%"))
+      (loop :for elm :in elements
+            :for n :from 0
+            :do (format t "~2d. ~a~%" n elm)))
+    (terpri)
+    (format t (color *section-color* "Usage:~%"))
+    (format t "  q: quit. 0~~9: inspect the numbered slot.~2%")))
 
 (defun inspector-process-key ()
   (rl:register-function :redisplay #'(lambda () nil))
@@ -54,7 +54,7 @@
       (inspect-one object)
       (format t "~c[?25h" #\escape)))
   (when *inspector-flush-screen*
-    (uiop:run-program "clear" :output *standard-output*)
+    (flush-screen)
     (if (zerop *debugger-level*)
         (set-keymap "default")
         (progn

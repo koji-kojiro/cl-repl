@@ -1,6 +1,6 @@
 (in-package :cl-repl)
 
-(defconstant +version+ '0.5.1)
+(defconstant +version+ '0.6.0)
 
 (defvar *logo*
   "  ___  __          ____  ____  ____  __
@@ -35,7 +35,7 @@
         (format *error-output* "Failed to load ~a, quitting.~%[~a]~%" *site-init-path* c)
         (uiop:quit 1)))))
 
-(defparameter *repl-flush-screen* t)
+(defparameter *repl-flush-screen* nil)
 
 (defmacro when-option ((options opt) &body body)
   `(let ((it (getf ,options ,opt)))
@@ -78,16 +78,15 @@
     (when-option (options :no-init)
       (setf *site-init-path* nil)))
   (site-init)
-  (when *repl-flush-screen*
-    (uiop:run-program "clear" :output *standard-output*))
-  (when show-logo
-    (format t (color *logo-color* *logo*)))
-  (format t "~a~%~a~2%" *versions* *copy*)
+  (when *repl-flush-screen* (flush-screen))
+  (with-cursor-hidden
+    (when show-logo
+      (format t (color *logo-color* *logo*)))
+    (format t "~a~%~a~2%" *versions* *copy*))
   (in-package :cl-user)
   (unwind-protect
     (conium:call-with-debugger-hook #'debugger #'repl)
     (rl:deprep-terminal))
-  (when *repl-flush-screen*
-    (uiop:run-program "clear" :output *standard-output*)))
+  (when *repl-flush-screen* (flush-screen)))
 
 

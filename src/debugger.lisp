@@ -5,7 +5,7 @@
 (defvar *selected-restart*)
 (defvar *backtrace-strings* nil)
 (defvar *redisplay-debugger-banner*)
-(defparameter *debugger-flush-screen* t)
+(defparameter *debugger-flush-screen* nil)
 
 (defun condition-string (condition)
   #+sbcl
@@ -15,31 +15,28 @@
   (princ-to-string condition))
 
 (defun debugger-banner ()
-  (when *debugger-flush-screen*
-    (uiop:run-program "clear" :output *standard-output*))
-  (format t (color *condition-color* "~a~% [Condition of type ~a]~2%")
-          (condition-string *current-condition*) (type-of *current-condition*))
-  (format t (color *section-color* "Restarts:~%"))
-  (loop :with choices = *invokable-restarts*
-        :for choice :in choices
-        :for n :to (length choices)
-        :do (format t "~2d: [~a] ~a~%"  n (restart-name choice) choice))
-  (terpri)
-  (format t (color *section-color* "Backtrace:~%"))
-  (loop :for frame :in (split-sequence:split-sequence
-                         #\newline
-                         (car *backtrace-strings*)
-                         :remove-empty-subseqs t)
-        :for n :from 0 :below 2
-        :do (format t "~a~%" frame)
-        :finally (when (= n 2) (format t " --more--~%")))
-  (terpri)
-  (format t (color *section-color* "Usage:~%"))
-  (format t "  Ctrl+r: select restart. Ctrl+t: show backtrace.~%")
-  #+sbcl
-  (when (subtypep (type-of *current-condition*) 'sb-ext:step-condition)
-    (format t "  Ctrl+o: step-out. Ctrl+x: step-next, Ctrl+o: step-into.~%"))
-  (terpri))
+  (when *debugger-flush-screen* (flush-screen))
+  (with-cursor-hidden
+    (format t (color *condition-color* "~a~% [Condition of type ~a]~2%")
+            (condition-string *current-condition*) (type-of *current-condition*))
+    (format t (color *section-color* "Restarts:~%"))
+    (loop :with choices = *invokable-restarts*
+          :for choice :in choices
+          :for n :to (length choices)
+          :do (format t "~2d: [~a] ~a~%"  n (restart-name choice) choice))
+    (terpri)
+    (format t (color *section-color* "Backtrace:~%"))
+    (loop :for frame :in (split-lines (car *backtrace-strings*))
+          :for n :from 0 :below 2
+          :do (format t "~a~%" frame)
+          :finally (when (= n 2) (format t " --more--~%")))
+    (terpri)
+    (format t (color *section-color* "Usage:~%"))
+    (format t "  Ctrl+r: select restart. Ctrl+t: show backtrace.~%")
+    #+sbcl
+    (when (subtypep (type-of *current-condition*) 'sb-ext:step-condition)
+      (format t "  Ctrl+o: step-out. Ctrl+x: step-next, Ctrl+o: step-into.~%"))
+    (terpri)))
 
 (defun cl-repl/compute-restarts (condition)
   (let ((restarts (compute-restarts condition))
@@ -103,8 +100,7 @@
     (let ((*debugger-hook* hook))
       (debugger-loop (1+ *debugger-level*)))
     (setf *redisplay-debugger-banner* t)
-    (when *debugger-flush-screen*
-      (uiop:run-program "clear" :output *standard-output*))
+    (when *debugger-flush-screen* (flush-screen))
     #+sbcl (pop *backtrace-strings*)
     (cl-repl/invoke-restart-interactively *selected-restart*)))
 

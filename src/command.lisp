@@ -27,13 +27,13 @@
   (message-from-magic "Command not found.: ~a" magic))
 
 (defun input-magic-p (&optional input)
-  (alexandria:starts-with-subseq "%" input))
+  (string-starts-with input "%"))
 
 (define-magic run (filename &rest args)
   "Execute file in current enviroment."
   (declare (ignore args))
   (if (probe-file filename)
-      (let ((code (format nil "(progn ~a )" (alexandria:read-file-into-string filename))))
+      (let ((code (format nil "(progn ~a )" (read-file-into-string filename))))
         (if (line-continue-p code)
             (message-from-magic "Error: Unexpected EOF.")
             code))

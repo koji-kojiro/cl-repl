@@ -33,11 +33,11 @@
 (defun select-completions (text items)
   (setf items
     (loop :for item :in items
-          :when (alexandria:starts-with-subseq text item)
+          :when (string-starts-with item text)
                 :collect item))
   (unless (cdr items)
     (setf rl:*completion-append-character*
-      (if (alexandria:ends-with-subseq ":" (car items)) #\nul #\space))
+      (if (string-ends-with (car items) ":") #\nul #\space))
     (return-from select-completions items))
   (cons
     (subseq (car items) 0
