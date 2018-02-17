@@ -79,6 +79,21 @@
         (message-from-magic "Error: Unexpected EOF.")
         code)))
 
+(define-magic expand (&rest forms)
+  "Alias to (macroexpand-1 (quote <form>))"
+  (let ((code (format nil "(macroexpand-1 '~{ ~a~})" forms)))
+    (if (line-continue-p code)
+        (message-from-magic "Error: Unexpected EOF.")
+        code)))
+
+(define-magic inspect (object &rest args)
+  "Alias to (inspect <object>)."
+  (declare (ignore args))
+  (let ((code (format nil "(inspect ~a)" object)))
+    (if (line-continue-p code)
+        (message-from-magic "Error: Unexpected EOF.")
+        code)))
+
 (define-magic step (&rest forms)
   "Alias to (step <form>)."
   (let ((code (format nil "(step ~{ ~a~})" forms)))
