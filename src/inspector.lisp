@@ -5,7 +5,7 @@
 (defvar *inspect-named-p*)
 (defvar *inspector-state*)
 (defvar *inspector-redisplay-banner*)
-(defparameter *inspector-flush-screen* t)
+(defparameter *inspector-flush-screen* nil)
 
 (defun inspector-banner ()
   (when *inspector-flush-screen* (flush-screen))

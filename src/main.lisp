@@ -35,7 +35,7 @@
         (format *error-output* "Failed to load ~a, quitting.~%[~a]~%" *site-init-path* c)
         (uiop:quit 1)))))
 
-(defparameter *repl-flush-screen* t)
+(defparameter *repl-flush-screen* nil)
 
 (defmacro when-option ((options opt) &body body)
   `(let ((it (getf ,options ,opt)))

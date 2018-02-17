@@ -5,7 +5,7 @@
 (defvar *selected-restart*)
 (defvar *backtrace-strings* nil)
 (defvar *redisplay-debugger-banner*)
-(defparameter *debugger-flush-screen* t)
+(defparameter *debugger-flush-screen* nil)
 
 (defun condition-string (condition)
   #+sbcl
