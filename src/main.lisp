@@ -1,6 +1,6 @@
 (in-package :cl-repl)
 
-(defconstant +version+ '0.5.0)
+(defconstant +version+ '0.6.0)
 
 (defvar *logo*
   "  ___  __          ____  ____  ____  __
@@ -35,6 +35,8 @@
         (format *error-output* "Failed to load ~a, quitting.~%[~a]~%" *site-init-path* c)
         (uiop:quit 1)))))
 
+(defparameter *repl-flush-screen* nil)
+
 (defmacro when-option ((options opt) &body body)
   `(let ((it (getf ,options ,opt)))
      (when it
@@ -54,6 +56,11 @@
    :short #\n
    :long "no-init"))
 
+(progn
+  (enable-syntax)
+  (rl:register-function :complete #'completer)
+  (install-inspector))
+
 (defun main (&optional argv &key (show-logo t))
   (multiple-value-bind (options free-args)
       (handler-case
@@ -70,14 +77,16 @@
       (uiop:quit 0))
     (when-option (options :no-init)
       (setf *site-init-path* nil)))
-  (enable-syntax)
   (site-init)
-  (when show-logo
-    (format t (color *logo-color* *logo*)))
-  (format t "~a~%~a~2%" *versions* *copy*)
-  #+sbcl (sb-ext:enable-debugger)
-  (rl:register-function :complete #'completer)
+  (when *repl-flush-screen* (flush-screen))
+  (with-cursor-hidden
+    (when show-logo
+      (format t (color *logo-color* *logo*)))
+    (format t "~a~%~a~2%" *versions* *copy*))
   (in-package :cl-user)
-  (repl)
-  (rl:deprep-terminal))
+  (unwind-protect
+    (conium:call-with-debugger-hook #'debugger #'repl)
+    (rl:deprep-terminal))
+  (when *repl-flush-screen* (flush-screen)))
+
 

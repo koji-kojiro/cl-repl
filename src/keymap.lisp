@@ -1,5 +1,6 @@
 (in-package :cl-repl)
 
+(defvar *keymap*)
 (defvar *keymaps* (make-hash-table :test 'equal))
 (defvar *rl-default-keymap* (rl:get-keymap))
 
@@ -21,7 +22,8 @@
   (gethash name *keymaps*))
 
 (define-keymap "default" ()
-  ("\\C-r" #'unbind-key))
+  ("\\C-r" #'unbind-key)
+  ("\\C-s" #'unbind-key))
 
 (defun set-keymap (name)
   (let ((keymap (find-keymap name)))

@@ -1,24 +1,25 @@
 (defsystem cl-repl
-  :version "0.5.0"
+  :version "0.6.0"
   :author "TANI Kojiro"
   :license "GPLv3"
-  :depends-on (#:alexandria
-               #:uiop
+  :depends-on (#:uiop
                #:unix-opts
-               #:split-sequence
-               #:trivial-backtrace
+               #:conium
                #:cl-ppcre
                #:cl-readline)
   :serial t
   :components ((:module "src" :components ((:file "package")
+                                           (:file "util")
                                            (:file "color")
                                            (:file "color-scheme")
                                            (:file "highlight")
                                            (:file "keymap")
+                                           (:file "pager")
                                            (:file "command")
                                            (:file "shell")
                                            (:file "completer")
                                            (:file "debugger")
+                                           (:file "inspector")
                                            (:file "input")
                                            (:file "repl")
                                            (:file "main"))))

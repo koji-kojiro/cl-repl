@@ -14,6 +14,7 @@
 (defparameter *section-color* 21)
 (defparameter *message-color* 248)
 
+(defparameter *magic-syntax-color* 39)
 (defparameter *string-syntax-color* 184)
 (defparameter *variable-syntax-color* 118)
 (defparameter *constant-syntax-color* 118)
