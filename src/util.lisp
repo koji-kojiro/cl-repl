@@ -15,10 +15,19 @@
    (string= str suffix :start1 (- (length str) (length suffix)))))
 
 (defmacro string-case (str &rest forms)
-  `(case (intern ,str)
-     ,@(loop :for (s f) :in forms
-             :if (stringp s) :collect `(,(intern s) ,f)
-             :else :collect `(,s ,f))))
+  (let ((test (gensym)))
+    `(let ((,test ,str))
+       (cond
+         ,@(loop :for (s  f) :in forms
+                 :if (stringp s) :collect `((string= ,test ,s) ,f)
+                 :else :if (string= s 'otherwise) :collect `(t ,f)
+                       :else :collect `((eql ,test ,s) ,f))))))
+
+(defun read-file-into-string (file)
+  (with-open-file (s file :direction :input)
+    (let ((buf (make-string (file-length s))))
+      (read-sequence buf s)
+      buf)))
 
 (defmacro with-cursor-hidden (&body body)
   `(unwind-protect
