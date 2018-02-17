@@ -9,8 +9,10 @@
     "\\\\+"))
 
 (defun list-regex (lst)
-;   (format nil "(?<=\\b)(~{~a|~})(?=\\b)" lst))
-  (format nil "((?<=\\s)|^|(?<=\\()|(?<=\\)))(~{~a|~})(?=\\b)" lst))
+  (format nil
+          "((?<=\\s)|^|(?<=\\()|(?<=\\)))(~{~a|~})(?=\\b)"
+          (sort lst #'string>)))
+          
 
 (destructuring-bind (functions specials)
   (loop :for sym :being :the :external-symbols :of :cl
