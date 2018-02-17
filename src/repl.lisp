@@ -5,12 +5,13 @@
 (defun exit-with-prompt ()
   (finish-output)
   (when (zerop *debugger-level*)
-    (alexandria:switch
-        ((rl:readline :prompt "Do you really want to exit ([y]/n)? ")
-         :test #'equal)
-      (nil (terpri)) ("") ("y")
+    (string-case
+      (rl:readline :prompt "Do you really want to exit ([y]/n)? ")
+      (nil (terpri))
+      ("")
+      ("y")
       ("n" (return-from exit-with-prompt (setf *last-input* "nil")))
-      (t (exit-with-prompt))))
+      (otherwise (return-from exit-with-prompt (exit-with-prompt)))))
   (throw *debugger-level* nil))
 
 (defvar *output-indicator-function*
