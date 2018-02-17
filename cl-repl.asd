@@ -2,16 +2,14 @@
   :version "0.5.1"
   :author "TANI Kojiro"
   :license "GPLv3"
-  :depends-on (#:alexandria
-               #:uiop
+  :depends-on (#:uiop
                #:unix-opts
-               #:split-sequence
-               #:trivial-backtrace
                #:conium
                #:cl-ppcre
                #:cl-readline)
   :serial t
   :components ((:module "src" :components ((:file "package")
+                                           (:file "util")
                                            (:file "color")
                                            (:file "color-scheme")
                                            (:file "highlight")
