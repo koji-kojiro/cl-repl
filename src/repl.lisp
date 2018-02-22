@@ -22,13 +22,11 @@
   (finish-output) t) 
 
 (defun eval-print (-)
-  (setq values
-        (multiple-value-list
-          (eval -)))
+  (let ((values (multiple-value-list (eval -))))
   (setq +++ ++ /// // *** (car ///)
         ++ + // / ** (car //)
         + - / values * (car /))
-  (print-result values))
+  (print-result values)))
 
 (defmacro with-extra-restarts (form &rest restarts)
   `(restart-case ,form
