@@ -1,5 +1,5 @@
 (defsystem cl-repl
-  :version "0.6.1"
+  :version "0.6.2"
   :author "TANI Kojiro"
   :license "GPLv3"
   :depends-on (#:uiop

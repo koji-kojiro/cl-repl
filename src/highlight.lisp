@@ -9,8 +9,9 @@
     "\\\\+"))
 
 (defun list-regex (lst)
-;   (format nil "(?<=\\b)(~{~a|~})(?=\\b)" lst))
-  (format nil "((?<=\\s)|^|(?<=\\()|(?<=\\)))(~{~a|~})(?=\\b)" lst))
+  (format nil
+          "((?<=\\s)|^|(?<=\\()|(?<=\\)))(~{~a|~})(?=(\\s|\\(|\\)|$))"
+          (sort lst #'string>)))
 
 (destructuring-bind (functions specials)
   (loop :for sym :being :the :external-symbols :of :cl
@@ -21,7 +22,7 @@
         :finally (return (list functions specials)))
   (defvar *syntax-table*
     (list
-     :magic (list *magic-syntax-color* "^%.*")
+     :magic (list *magic-syntax-color* "^%\\S+")
      :string (list *string-syntax-color* "\".*?\"")
      :variable (list *variable-syntax-color* "([\\*])\\S+\\1")
      :constant (list *constant-syntax-color* "([\\+])\\S+\\1")
