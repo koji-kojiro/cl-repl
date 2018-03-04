@@ -40,6 +40,11 @@ $ brew link --force readline
 
 Also, ensure that your terminal support 256 colors.
 
+
+## Note about installation via Roswell
+If you installed roswell with normal configurations, cl-repl will be located in `~/.roswell/bin`.  
+To use cl-repl from the command line, please ensure the PATH variable includes `~/.roswell/bin`.
+
 # Usage
 ```
 $　cl-repl
