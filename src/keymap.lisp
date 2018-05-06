@@ -23,7 +23,8 @@
 
 (define-keymap "default" ()
   ("\\C-r" #'unbind-key)
-  ("\\C-s" #'unbind-key))
+  ("\\C-s" #'unbind-key)
+  ("\\C-l" (lambda (&rest args) (invoke-magic "%cls"))))
 
 (defun set-keymap (name)
   (let ((keymap (find-keymap name)))
