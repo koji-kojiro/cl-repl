@@ -1,6 +1,6 @@
 (in-package :cl-repl)
 
-(defconstant +version+ '0.6.2)
+(defconstant +version+ '0.6.3)
 
 (defvar *logo*
   "  ___  __          ____  ____  ____  __
