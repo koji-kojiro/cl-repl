@@ -108,15 +108,18 @@
   (declare (ignore args key))
   (format t "~%Restart number: ")
   (finish-output)
-  (let ((rl:*done* t))
-    (setf n (digit-char-p (rl:read-key))))  
-  (if (or (null n) (>= n (length *invokable-restarts*)))
-      (format t "~%Please input number below ~d.~%" (1- (length *invokable-restarts*)))
-      (progn
-        (terpri)
-        (setf *selected-restart*
-              (find-restart (nth n *invokable-restarts*)))
-        (throw *debugger-level* nil))))
+  (let* ((key (let ((prev rl:*done*))
+                (setf rl:*done* t)
+                (unwind-protect (rl:read-key)
+                  (setf rl:*done* prev))))
+         (n (digit-char-p key)))
+    (if (or (null n) (>= n (length *invokable-restarts*)))
+        (format t "~%Please input number below ~d.~%" (1- (length *invokable-restarts*)))
+        (progn
+          (terpri)
+          (setf *selected-restart*
+                (find-restart (nth n *invokable-restarts*)))
+          (throw *debugger-level* nil)))))
 
 (defun show-backtrace (args key)
   (declare (ignore args key))
@@ -126,8 +129,7 @@
 
 (defmacro set-restart (restart-designator)
   (let ((restart (gensym)))
-    `(progn
-       (setf ,restart (find-restart ,restart-designator))
+    `(let ((,restart (find-restart ,restart-designator)))
        (when ,restart
          (setf rl:*done* t)
          (setf *selected-restart* ,restart)

@@ -6,8 +6,7 @@
 
 (defmacro define-keymap (name (&optional parent) &body bindings)
   (let ((keymap (gensym)))
-    `(progn 
-       (setf ,keymap (rl:copy-keymap (or (find-keymap ,parent) *rl-default-keymap*)))
+    `(let ((,keymap (rl:copy-keymap (or (find-keymap ,parent) *rl-default-keymap*))))
        (loop :for (key func) :in ',bindings
              :when (stringp key)
              :do (rl:bind-keyseq key (eval func) :keymap ,keymap)
@@ -24,7 +23,9 @@
 (define-keymap "default" ()
   ("\\C-r" #'unbind-key)
   ("\\C-s" #'unbind-key)
-  ("\\C-l" (lambda (&rest args) (invoke-magic "%cls"))))
+  ("\\C-l" (lambda (&rest args)
+             (declare (ignore args))
+             (invoke-magic "%cls"))))
 
 (defun set-keymap (name)
   (let ((keymap (find-keymap name)))
