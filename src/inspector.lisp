@@ -79,7 +79,7 @@
     (when (and n (< -1 n (length *inspect-elements*)))
       (let* ((element (nth n *inspect-elements*))
              (value (if *inspect-named-p* (cdr element) element)))
-        (if (eq value sb-impl::*inspect-unbound-object-marker*)
+        (if (eq value sb-pcl:+slot-unbound+)
             (format t (color *condition-color* "That slot is unbound.~%"))
             (inspect-one value))))))
 
