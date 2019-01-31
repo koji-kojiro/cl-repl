@@ -64,10 +64,11 @@
 (defun main (&optional argv &key (show-logo t))
   (multiple-value-bind (options free-args)
       (handler-case
-          (if argv (opts:get-opts argv) (opts:get-opts))
+        (if argv (opts:get-opts argv) (opts:get-opts))
         (error ()
           (format t "try `cl-repl --help`.~&")
           (uiop:quit 1)))
+    (declare (ignore free-args))
     (when-option (options :help)
       (opts:describe
        :prefix "A full-featured Common Lisp REPL implementation.")
