@@ -23,7 +23,7 @@
     (terpri)
     (format t (color *section-color* "Usage:~%"))
     (format t "  q: quit. 0~~9: inspect the numbered slot.~%")
-    (format t "  u: move previous. >: evaluate an expression.~%")))
+    (format t "  u: move previous. >: evaluate an expression.~2%")))
 
 (defun inspector-process-key ()
   (rl:register-function :redisplay #'(lambda () nil))
