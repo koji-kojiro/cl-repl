@@ -44,6 +44,13 @@
     (format t "~c[2J~@*~c[;H" #\esc)
     (finish-output)))
 
+(defun make-tag (name)
+  (intern (write-to-string name) :cl-repl))
 
+(defmacro throw* (tag result-form)
+  `(throw (make-tag ,tag) ,result-form))
+
+(defmacro catch* (tag &body forms)
+  `(catch (make-tag ,tag) ,@forms))
 
 
