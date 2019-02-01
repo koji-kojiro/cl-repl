@@ -14,6 +14,6 @@ exec ros -Q -L sbcl-bin -- $0 "$@"
 
 (defun main (&rest argv)
   (declare (ignorable argv))
-  (cl-repl:main argv :show-logo nil))
+  (cl-repl:main argv nil))
 
 ;;; vim: set ft=lisp lisp:

@@ -61,7 +61,7 @@
   (rl:register-function :complete #'completer)
   (install-inspector))
 
-(defun main (&optional argv &key (show-logo t))
+(defun main (&optional argv (show-logo t))
   (multiple-value-bind (options free-args)
       (handler-case
         (if argv (opts:get-opts argv) (opts:get-opts))
