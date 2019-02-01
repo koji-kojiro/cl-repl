@@ -85,7 +85,7 @@
 
 (defun debugger-loop (level)
   (let ((*debugger-level* level))
-    (loop :while (catch level (read-eval-print :level level))
+    (loop :while (catch* level (read-eval-print :level level))
           :when *redisplay-debugger-banner*
                 :do (progn (debugger-banner) (setf *redisplay-debugger-banner* nil)))))
 
@@ -119,7 +119,7 @@
           (terpri)
           (setf *selected-restart*
                 (find-restart (nth n *invokable-restarts*)))
-          (throw *debugger-level* nil)))))
+          (throw* *debugger-level* nil)))))
 
 (defun show-backtrace (args key)
   (declare (ignore args key))
@@ -133,7 +133,7 @@
        (when ,restart
          (setf rl:*done* t)
          (setf *selected-restart* ,restart)
-         (throw *debugger-level* nil)))))
+         (throw* *debugger-level* nil)))))
 
 (defun step-out (args key)
   (declare (ignore args key))

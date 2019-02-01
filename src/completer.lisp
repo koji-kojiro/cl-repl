@@ -12,14 +12,17 @@
       (t (list text nil  t)))))
 
 (defun list-external-symbols (sym-name pkg-name)
+  (declare (ignore sym-name))
   (loop :for sym :being :the :external-symbols :of (find-package pkg-name)
         :collect (format nil "~(~a:~a~)" pkg-name sym)))
 
 (defun list-internal-symbols (sym-name pkg-name)
+  (declare (ignore sym-name))
   (loop :for sym :being :the :symbols :of (find-package pkg-name)
         :collect (format nil "~(~a::~a~)" pkg-name sym)))
 
 (defun list-symbols-and-packages (sym-name)
+  (declare (ignore sym-name))
   (concatenate 'list
     (loop :for pkg :in (list-all-packages)
           :append (loop :for name :in (package-nicknames pkg)

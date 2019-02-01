@@ -12,7 +12,7 @@
       ("y")
       ("n" (return-from exit-with-prompt (setf *last-input* "nil")))
       (otherwise (return-from exit-with-prompt (exit-with-prompt)))))
-  (throw *debugger-level* nil))
+  (throw* *debugger-level* nil))
 
 (defvar *output-indicator-function*
   #'(lambda () "[OUT]: "))
@@ -31,7 +31,7 @@
 (defmacro with-extra-restarts (form &rest restarts)
   `(restart-case ,form
      (*abort () :report "Deduce debugger level." t)
-     (*exit () :report "Exit CL-REPL." (throw 0 nil))
+     (*exit () :report "Exit CL-REPL." (throw* 0 nil))
      ,@restarts))
 
 (defun read-eval-print (&key (level 0))
@@ -44,5 +44,5 @@
 (defun repl ()
   (loop :when (string/= *keymap* "default")
               :do (set-keymap "default")
-        :while (catch 0 (read-eval-print))))
+        :while (catch* 0 (read-eval-print))))
  
