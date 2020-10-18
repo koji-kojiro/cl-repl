@@ -56,6 +56,7 @@
                   :collect (or colored raw)))))
 
 (defun redisplay-with-highlight ()
+  (rl:redisplay)
   (format t "~c[2K~c~a~a~c[~aD"
           #\esc
           #\return
