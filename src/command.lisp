@@ -30,7 +30,7 @@
   (string-starts-with input "%"))
 
 (define-magic run (filename &rest args)
-  "Execute file in current enviroment."
+  "Execute file in current environment."
   (declare (ignore args))
   (if (probe-file filename)
       (let ((code (format nil "(progn ~a )" (read-file-into-string filename))))
@@ -115,7 +115,7 @@
         :finally (return "nil")))
 
 (define-magic package (&optional (package "cl-user") &rest args)
-  "Alias to (in-pacakge <package>)."
+  "Alias to (in-package <package>)."
   (declare (ignore args))
   (handler-case
       (let ((p (current-package)))
