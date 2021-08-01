@@ -54,7 +54,17 @@
   (:name :no-init
    :description "Skip to load init file."
    :short #\n
-   :long "no-init"))
+   :long "no-init")
+  (:name :load
+   :description "Load a file"
+   :short #\l
+   :long "load"
+   :arg-parser #'identity)
+  (:name :eval
+   :description "Eval a form"
+   :short #\e
+   :long "eval"
+   :arg-parser #'identity))
 
 (progn
   (enable-syntax)
@@ -76,7 +86,11 @@
       (format t "cl-repl v~a~&" +version+)
       (uiop:quit 0))
     (when-option (options :no-init)
-      (setf *site-init-path* nil)))
+      (setf *site-init-path* nil))
+    (loop for (k v) on options by #'cddr
+          do (case k
+               (:eval (eval (read-from-string v)))
+               (:load (load v)))))
   (site-init)
   (when *repl-flush-screen* (flush-screen))
   (with-cursor-hidden
