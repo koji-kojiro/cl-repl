@@ -6,7 +6,8 @@ exec ros -Q -L sbcl-bin -- $0 "$@"
 (progn ;;init forms
   (ros:ensure-asdf)
   (unless (find-package :cl-repl)
-    (ql:quickload :cl-repl :silent t)))
+    (handler-bind ((asdf:bad-system-name #'muffle-warning))
+      (ql:quickload :cl-repl :silent t))))
 
 (defpackage :ros.script.cl-repl.3724301384
   (:use :cl))
