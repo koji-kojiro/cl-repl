@@ -11,7 +11,8 @@
       ("")
       ("y")
       ("n" (return-from exit-with-prompt (setf *last-input* "nil")))
-      (otherwise (return-from exit-with-prompt (exit-with-prompt)))))
+      (otherwise (return-from exit-with-prompt (exit-with-prompt))))
+    (uiop:quit))
   (throw *debugger-level* nil))
 
 (defvar *output-indicator-function*
